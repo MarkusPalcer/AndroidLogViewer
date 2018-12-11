@@ -50,9 +50,9 @@
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
-                <GroupBox Header="Whitelisted Processes/Threads">
+                <GroupBox Header="Processes/Threads">
                     <StackPanel Orientation="Vertical">
-                        <ItemsControl ItemsSource="{Binding ActiveProcessThreadFilters}">
+                        <ItemsControl ItemsSource="{Binding WhitelistedProcessThreadFilters}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Orientation="Vertical"></StackPanel>
@@ -61,7 +61,23 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type local:ProcessThreadFilter}">
                                     <DockPanel LastChildFill="True">
-                                        <Button Content="X" Command="{Binding ElementName=Root, Path=DataContext.RemoveProcessThreadFilterCommand}" CommandParameter="{Binding}" />
+                                        <Button Content="X" Command="{Binding ElementName=Root, Path=DataContext.RemoveWhitelistedProcessThreadFilterCommand}" CommandParameter="{Binding}" />
+                                        <TextBlock Text="{Binding}" />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl ItemsSource="{Binding BlacklistedProcessThreadFilters}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"></StackPanel>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type local:ProcessThreadFilter}">
+                                    <DockPanel LastChildFill="True">
+                                        <Button Content="X" Command="{Binding ElementName=Root, Path=DataContext.RemoveBlacklistedProcessThreadFilterCommand}" CommandParameter="{Binding}" />
+                                        <TextBlock Text="!" />
                                         <TextBlock Text="{Binding}" />
                                     </DockPanel>
                                 </DataTemplate>
@@ -70,7 +86,11 @@
                         <DockPanel LastChildFill="True">
                             <Button CommandParameter="{Binding ElementName=SelectedProcessThreadFilter, Path=SelectedItem}"
                                 DockPanel.Dock="Right"
-                                Command="{Binding AddProcessThreadFilterCommand}">Add</Button>
+                                Command="{Binding AddWhitelistedProcessThreadFilterCommand}">Whitelist</Button>
+
+                            <Button CommandParameter="{Binding ElementName=SelectedProcessThreadFilter, Path=SelectedItem}"
+                                    DockPanel.Dock="Right"
+                                    Command="{Binding AddBlacklistedProcessThreadFilterCommand}">Blacklist</Button>
 
                             <ComboBox x:Name="SelectedProcessThreadFilter"
                                   ItemsSource="{Binding AvailableProcessThreadFilters}" />
@@ -78,8 +98,7 @@
                         </DockPanel>
                     </StackPanel>
                 </GroupBox>
-
-                <GroupBox Header="Whitelisted Tags">
+                <GroupBox Header="Tags">
                     <StackPanel Orientation="Vertical">
                         <ItemsControl ItemsSource="{Binding WhitelistedTags}">
                             <ItemsControl.ItemsPanel>
@@ -96,10 +115,29 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+                        <ItemsControl ItemsSource="{Binding BlacklistedTags}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"></StackPanel>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type system:String}">
+                                    <DockPanel LastChildFill="True">
+                                        <Button Content="X" Command="{Binding ElementName=Root, Path=DataContext.RemoveBlacklistedTagCommand}" CommandParameter="{Binding}" />
+                                        <TextBlock Text="!" />
+                                        <TextBlock Text="{Binding}" />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                         <DockPanel LastChildFill="True">
                             <Button CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
                                     DockPanel.Dock="Right"
-                                    Command="{Binding AddWhitelistedTagCommand}">Add</Button>
+                                    Command="{Binding AddWhitelistedTagCommand}">Whitelist</Button>
+                            <Button CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
+                                    DockPanel.Dock="Right"
+                                    Command="{Binding AddBlacklistedTagCommand}">Blacklist</Button>
 
                             <ComboBox x:Name="SelectedTag"
                                       ItemsSource="{Binding AvailableTags}" />
@@ -123,11 +161,70 @@
         
 
         <ListView x:Name="LogItems"
-            Grid.Row="1"
+                  Grid.Row="1"
                   Grid.Column="1"
                   ItemsSource="{Binding LogEntries}"
                   Style="{StaticResource MonospaceFont}"
-                  SelectedIndex="{Binding SelectedLogEntryIndex}">
+                  SelectedIndex="{Binding SelectedLogEntryIndex}"
+                  SelectedItem="{Binding Path=SelectedLogEntry, Mode=OneWayToSource}">
+            <ListView.Resources>
+                <ContextMenu x:Key="ItemContextMenu">
+                    <MenuItem Command="{Binding Path=DataContext.ShowOnlyProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                        <MenuItem.Header>
+                            <TextBlock
+                                Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this process ({0}/*)'}">
+                            </TextBlock>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Command="{Binding Path=DataContext.ShowOnlyThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                        <MenuItem.Header>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="Show only this thread ({0}/{1})" > 
+                                        <Binding Path="SelectedItem.Process" RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
+                                        <Binding Path="SelectedItem.Thread" RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
+                                    </MultiBinding> 
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Command="{Binding Path=DataContext.HideProcesOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                        <MenuItem.Header>
+                            <TextBlock
+                                Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this process ({0}/*)'}">
+                            </TextBlock>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Command="{Binding Path=DataContext.HideThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                        <MenuItem.Header>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="Hide this thread ({0}/{1})" > 
+                                        <Binding Path="SelectedItem.Process" RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
+                                        <Binding Path="SelectedItem.Thread" RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
+                                    </MultiBinding> 
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </MenuItem.Header>
+                    </MenuItem>
+
+                    <MenuItem Command="{Binding Path=DataContext.ShowOnlyTagForSelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                        <MenuItem.Header>
+                            <TextBlock
+                                Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this tag ({0})'}">
+                            </TextBlock>
+                        </MenuItem.Header>
+                    </MenuItem>
+
+                    <MenuItem Command="{Binding Path=DataContext.HideTagOfSelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                        <MenuItem.Header>
+                            <TextBlock
+                                Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this tag ({0})'}">
+                            </TextBlock>
+                        </MenuItem.Header>
+                    </MenuItem>
+                </ContextMenu>
+            </ListView.Resources>
             <ListView.View>
                 <GridView>
                     <!--<GridViewColumn Header="Time" DisplayMemberBinding="{Binding Path=Time}" />-->
@@ -138,6 +235,11 @@
                     <GridViewColumn Header="Message" DisplayMemberBinding="{Binding Path=Message}" />
                 </GridView>
             </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
 
         <GridSplitter Grid.Row="1" Grid.Column="1" ResizeDirection="Columns" Width="5" VerticalAlignment="Stretch" HorizontalAlignment="Left" />
