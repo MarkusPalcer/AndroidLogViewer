@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -22,112 +24,184 @@ namespace AndroidLogViewer
 
         public MainWindowViewModel()
         {
-            SearchForwardCommand = new DelegateCommand<string>(searchText =>
-            {
-                if (_defaultView == null) return;
+            SearchForwardCommand = new DelegateCommand<string>(SearchForward);
 
-                var newIndex = SelectedLogEntryIndex;
-                foreach (var entry in _defaultView.OfType<LogEntry>().Skip(SelectedLogEntryIndex + 1))
-                {
-                    newIndex++;
-                    if (MatchesSearch(entry, searchText))
-                    {
-                        SelectedLogEntryIndex = newIndex;
-                        break;
-                    }
-                }
-            });
+            SearchBackwardCommand = new DelegateCommand<string>(SearchBackward);
 
-            SearchBackwardCommand = new DelegateCommand<string>(searchText =>
-            {
-                if (_defaultView == null) return;
+            RemoveWhitelistedTagCommand = new DelegateCommand<string>(RemoveWhitelistedTag);
+            AddWhitelistedTagCommand = new DelegateCommand<string>(AddWhitelistedTag);
+            ShowOnlyTagForSelectedItemCommand = new DelegateCommand(ShowOnlyTagForSelectedItem);
+            RemoveBlacklistedTagCommand = new DelegateCommand<string>(RemoveBlacklistedTag);
+            AddBlacklistedTagCommand = new DelegateCommand<string>(AddBlacklistedTag);
+            HideTagOfSelectedItemCommand = new DelegateCommand(HideTagOfSelectedItem);
 
-                var items = _defaultView.OfType<LogEntry>().ToArray();
+            RemoveWhitelistedProcessThreadFilterCommand = new DelegateCommand<ProcessThreadFilter>(RemoveWhitelistedProcesThreadFilter);
+            AddWhitelistedProcessThreadFilterCommand = new DelegateCommand<ProcessThreadFilter>(AddWhitelistedProcessThreadFilter);
+            ShowOnlyProcessOfSelectedItemCommand = new DelegateCommand(ShowOnlyProcessOfSelectedItem);
+            ShowOnlyThreadOfSelectedItemCommand = new DelegateCommand(ShowOnlyThreadOfSelectedItem);
 
-                var newIndex = SelectedLogEntryIndex;
-                while (newIndex > 0)
-                {
-                    newIndex--;
-                    if (MatchesSearch(items[newIndex], searchText))
-                    {
-                        SelectedLogEntryIndex = newIndex;
-                        break;
-                    }
-                }
-            });
-
-            RemoveWhitelistedTagCommand = new DelegateCommand<string>(tag => WhitelistedTags.Remove(tag));
-            AddWhitelistedTagCommand = new DelegateCommand<string>(tag => WhitelistedTags.Add(tag));
-            ShowOnlyTagForSelectedItem = new DelegateCommand(() =>
-            {
-                var entry = SelectedLogEntry;
-                WhitelistedTags.Clear();
-                WhitelistedTags.Add(entry.Tag);
-            });
-            RemoveBlacklistedTagCommand = new DelegateCommand<string>(tag => BlacklistedTags.Remove(tag));
-            AddBlacklistedTagCommand = new DelegateCommand<string>(tag => BlacklistedTags.Add(tag));
-            HideTagOfSelectedItem = new DelegateCommand(() =>
-            {
-                var entry = SelectedLogEntry;
-                BlacklistedTags.Add(entry.Tag);
-            });
-
-            RemoveWhitelistedProcessThreadFilterCommand = new DelegateCommand<ProcessThreadFilter>(f => WhitelistedProcessThreadFilters.Remove(f));
-            AddWhitelistedProcessThreadFilterCommand = new DelegateCommand<ProcessThreadFilter>(filter =>
-            {
-                WhitelistedProcessThreadFilters.Add(filter);
-            });
-            ShowOnlyProcessOfSelectedItemCommand = new DelegateCommand(() =>
-            {
-                var entry = SelectedLogEntry;
-                WhitelistedProcessThreadFilters.Clear();
-                WhitelistedProcessThreadFilters.Add(new ProcessThreadFilter
-                {
-                    Process = entry.Process,
-                    Thread = null
-                });
-            });
-            ShowOnlyThreadOfSelectedItemCommand = new DelegateCommand(() =>
-            {
-                var entry = SelectedLogEntry;
-                WhitelistedProcessThreadFilters.Clear();
-                WhitelistedProcessThreadFilters.Add(new ProcessThreadFilter
-                {
-                    Process = entry.Process,
-                    Thread = entry.Thread
-                });
-            });
-
-            RemoveBlacklistedProcessThreadFilterCommand = new DelegateCommand<ProcessThreadFilter>(f => BlacklistedProcessThreadFilters.Remove(f));
-            AddBlacklistedProcessThreadFilterCommand = new DelegateCommand<ProcessThreadFilter>(filter =>
-            {
-                BlacklistedProcessThreadFilters.Add(filter);
-            });
-            HideProcesOfSelectedItemCommand = new DelegateCommand(() =>
-            {
-                var entry = SelectedLogEntry;
-                BlacklistedProcessThreadFilters.Add(new ProcessThreadFilter
-                {
-                    Process = entry.Process,
-                    Thread = null
-                });
-            });
-            HideThreadOfSelectedItemCommand = new DelegateCommand(() =>
-            {
-                var entry = SelectedLogEntry;
-                BlacklistedProcessThreadFilters.Add(new ProcessThreadFilter
-                {
-                    Process = entry.Process,
-                    Thread = entry.Thread
-                });
-            });
+            RemoveBlacklistedProcessThreadFilterCommand = new DelegateCommand<ProcessThreadFilter>(RemoveBlacklistedProcessThreadFilter);
+            AddBlacklistedProcessThreadFilterCommand = new DelegateCommand<ProcessThreadFilter>(AddBlacklistedProcessThreadFilter);
+            HideProcessOfSelectedItemCommand = new DelegateCommand(HideProcessOfSelectedItem);
+            HideThreadOfSelectedItemCommand = new DelegateCommand(HideThreadOfSelectedItem);
 
             OpenFileCommand = new DelegateCommand(OpenFile);
 
-            WhitelistedProcessThreadFilters.CollectionChanged += (sender, args) => _defaultView?.Refresh();
-            BlacklistedProcessThreadFilters.CollectionChanged += (_, __) => _defaultView?.Refresh();
-            WhitelistedTags.CollectionChanged += (sender, args) => _defaultView?.Refresh();
-            BlacklistedTags.CollectionChanged += (_, __) => _defaultView?.Refresh();
+            WhitelistedProcessThreadFilters.CollectionChanged += RefreshView;
+            BlacklistedProcessThreadFilters.CollectionChanged += RefreshView;
+            WhitelistedTags.CollectionChanged += RefreshView;
+            BlacklistedTags.CollectionChanged += RefreshView;
+        }
+
+        private void RefreshView(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            // Try to find the entry in the filtered list or select the first item that comes after it.
+            var selectedLogEntry = SelectedLogEntry;
+            _defaultView.Refresh();
+
+            if (_defaultView == null) return;
+            if (_logEntries == null) return;
+            
+            using(var logEntryEnumerator = _logEntries.GetEnumerator())
+            using(var filteredEnumerator = _defaultView.OfType<LogEntry>().GetEnumerator())
+            {
+                if (!logEntryEnumerator.MoveNext()) return;
+                var index = -1;
+
+                while (filteredEnumerator.MoveNext())
+                {
+                    index++;
+
+                    if (filteredEnumerator.Current == selectedLogEntry)
+                    {
+                        SelectedLogEntryIndex = index;
+                        return;
+                    }
+
+                    while (logEntryEnumerator.Current != filteredEnumerator.Current)
+                    {
+                        logEntryEnumerator.MoveNext();
+                        if (logEntryEnumerator.Current != selectedLogEntry) continue;
+
+                        SelectedLogEntryIndex = index;
+                        return;
+                    }
+                }
+            }
+        }
+
+
+        private void HideThreadOfSelectedItem()
+        {
+            var entry = SelectedLogEntry;
+            BlacklistedProcessThreadFilters.Add(new ProcessThreadFilter {Process = entry.Process, Thread = entry.Thread});
+        }
+
+        private void HideProcessOfSelectedItem()
+        {
+            var entry = SelectedLogEntry;
+            BlacklistedProcessThreadFilters.Add(new ProcessThreadFilter {Process = entry.Process, Thread = null});
+        }
+
+        private void AddBlacklistedProcessThreadFilter(ProcessThreadFilter filter)
+        {
+            BlacklistedProcessThreadFilters.Add(filter);
+        }
+
+        private void RemoveBlacklistedProcessThreadFilter(ProcessThreadFilter f)
+        {
+            BlacklistedProcessThreadFilters.Remove(f);
+        }
+
+        private void ShowOnlyThreadOfSelectedItem()
+        {
+            var entry = SelectedLogEntry;
+            WhitelistedProcessThreadFilters.Clear();
+            WhitelistedProcessThreadFilters.Add(new ProcessThreadFilter {Process = entry.Process, Thread = entry.Thread});
+        }
+
+        private void ShowOnlyProcessOfSelectedItem()
+        {
+            var entry = SelectedLogEntry;
+            WhitelistedProcessThreadFilters.Clear();
+            WhitelistedProcessThreadFilters.Add(new ProcessThreadFilter {Process = entry.Process, Thread = null});
+        }
+
+        private void AddWhitelistedProcessThreadFilter(ProcessThreadFilter filter)
+        {
+            WhitelistedProcessThreadFilters.Add(filter);
+        }
+
+        private void RemoveWhitelistedProcesThreadFilter(ProcessThreadFilter f)
+        {
+            WhitelistedProcessThreadFilters.Remove(f);
+        }
+
+        private void HideTagOfSelectedItem()
+        {
+            var entry = SelectedLogEntry;
+            BlacklistedTags.Add(entry.Tag);
+        }
+
+        private void AddBlacklistedTag(string tag)
+        {
+            BlacklistedTags.Add(tag);
+        }
+
+        private void RemoveBlacklistedTag(string tag)
+        {
+            BlacklistedTags.Remove(tag);
+        }
+
+        private void ShowOnlyTagForSelectedItem()
+        {
+            var entry = SelectedLogEntry;
+            WhitelistedTags.Clear();
+            WhitelistedTags.Add(entry.Tag);
+        }
+
+        private void AddWhitelistedTag(string tag)
+        {
+            WhitelistedTags.Add(tag);
+        }
+
+        private void RemoveWhitelistedTag(string tag)
+        {
+            WhitelistedTags.Remove(tag);
+        }
+
+        private void SearchBackward(string searchText)
+        {
+            if (_defaultView == null) return;
+
+            var items = _defaultView.OfType<LogEntry>().ToArray();
+
+            var newIndex = SelectedLogEntryIndex;
+            while (newIndex > 0)
+            {
+                newIndex--;
+                if (MatchesSearch(items[newIndex], searchText))
+                {
+                    SelectedLogEntryIndex = newIndex;
+                    break;
+                }
+            }
+        }
+
+        private void SearchForward(string searchText)
+        {
+            if (_defaultView == null) return;
+
+            var newIndex = SelectedLogEntryIndex;
+            foreach (var entry in _defaultView.OfType<LogEntry>().Skip(SelectedLogEntryIndex + 1))
+            {
+                newIndex++;
+                if (MatchesSearch(entry, searchText))
+                {
+                    SelectedLogEntryIndex = newIndex;
+                    break;
+                }
+            }
         }
 
         public IEnumerable<LogEntry> LogEntries
@@ -138,8 +212,11 @@ namespace AndroidLogViewer
                 if (Equals(value, _logEntries)) return;
                 _logEntries = value;
 
+
                 _defaultView = CollectionViewSource.GetDefaultView(_logEntries);
-                _defaultView.Filter = FilterLogEntries;
+                if (_defaultView != null) {
+                    _defaultView.Filter = FilterLogEntries;
+                }
 
                 OnPropertyChanged();
             }
@@ -205,7 +282,7 @@ namespace AndroidLogViewer
 
         public ICommand HideThreadOfSelectedItemCommand { get; private set; }
 
-        public ICommand HideProcesOfSelectedItemCommand { get; private set; }
+        public ICommand HideProcessOfSelectedItemCommand { get; private set; }
         #endregion
 
         #region Tag filtering
@@ -230,13 +307,13 @@ namespace AndroidLogViewer
 
         public ICommand RemoveWhitelistedTagCommand { get; }
 
-        public ICommand ShowOnlyTagForSelectedItem { get; private set; }
+        public ICommand ShowOnlyTagForSelectedItemCommand { get; private set; }
 
         public ICommand AddBlacklistedTagCommand { get; }
 
         public ICommand RemoveBlacklistedTagCommand { get; }
 
-        public ICommand HideTagOfSelectedItem { get; private set; }
+        public ICommand HideTagOfSelectedItemCommand { get; private set; }
 
         #endregion
 
@@ -388,7 +465,8 @@ namespace AndroidLogViewer
                             Level = match.Groups["level"].Value,
                             Process = int.Parse(match.Groups["pid"].Value),
                             Thread = int.Parse(match.Groups["tid"].Value),
-                            Tag = match.Groups["tag"].Value
+                            Tag = match.Groups["tag"].Value,
+                            Time = match.Groups["datetime"].Value,
                         });
                     }
 

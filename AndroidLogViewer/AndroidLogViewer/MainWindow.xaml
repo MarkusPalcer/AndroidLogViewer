@@ -188,7 +188,7 @@
                             </TextBlock>
                         </MenuItem.Header>
                     </MenuItem>
-                    <MenuItem Command="{Binding Path=DataContext.HideProcesOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                    <MenuItem Command="{Binding Path=DataContext.HideProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
                         <MenuItem.Header>
                             <TextBlock
                                 Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this process ({0}/*)'}">
@@ -208,7 +208,7 @@
                         </MenuItem.Header>
                     </MenuItem>
 
-                    <MenuItem Command="{Binding Path=DataContext.ShowOnlyTagForSelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                    <MenuItem Command="{Binding Path=DataContext.ShowOnlyTagForSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
                         <MenuItem.Header>
                             <TextBlock
                                 Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this tag ({0})'}">
@@ -216,7 +216,7 @@
                         </MenuItem.Header>
                     </MenuItem>
 
-                    <MenuItem Command="{Binding Path=DataContext.HideTagOfSelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                    <MenuItem Command="{Binding Path=DataContext.HideTagOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
                         <MenuItem.Header>
                             <TextBlock
                                 Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this tag ({0})'}">
@@ -227,7 +227,7 @@
             </ListView.Resources>
             <ListView.View>
                 <GridView>
-                    <!--<GridViewColumn Header="Time" DisplayMemberBinding="{Binding Path=Time}" />-->
+                    <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Path=Time}" />
                     <GridViewColumn Header="PID" DisplayMemberBinding="{Binding Path=Process}" />
                     <GridViewColumn Header="TID" DisplayMemberBinding="{Binding Path=Thread}" />
                     <GridViewColumn Header="" DisplayMemberBinding="{Binding Path=Level}" />

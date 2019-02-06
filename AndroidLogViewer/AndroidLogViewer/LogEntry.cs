@@ -7,7 +7,7 @@ namespace AndroidLogViewer
 {
     public class LogEntry : INotifyPropertyChanged
     {
-        public DateTime Time { get; set; }
+        public String Time { get; set; }
 
         public int Process { get; set; }
 
