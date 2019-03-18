@@ -32,6 +32,7 @@
               Grid.ColumnSpan="2">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding OpenFileCommand}" />
+                <MenuItem Header="_Export filtered log" Command="{Binding ExportCommand}" />
             </MenuItem>
         </Menu>
 
