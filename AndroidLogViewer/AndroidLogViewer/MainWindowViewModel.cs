@@ -550,9 +550,20 @@ namespace AndroidLogViewer
 
         public LogEntry SelectedLogEntry { get; set; }
 
+        public bool SearchCaseSensitive { get; set; } = false;
+
         private bool MatchesSearch(LogEntry entry, string searchText)
         {
-            return entry.Message.Contains(searchText) || entry.Tag.Contains(searchText);
+            if (SearchCaseSensitive)
+            {
+                return entry.Message.Contains(searchText) || entry.Tag.Contains(searchText);
+            }
+            else
+            {
+                searchText = searchText.ToLowerInvariant();
+                return entry.Message.ToLowerInvariant().Contains(searchText) ||
+                       entry.Tag.ToLowerInvariant().Contains(searchText);
+            }
         }
 
         #endregion

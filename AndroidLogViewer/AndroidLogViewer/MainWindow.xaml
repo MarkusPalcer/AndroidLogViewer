@@ -45,6 +45,7 @@
                 <GroupBox Header="Search">
                     <StackPanel Orientation="Vertical">
                         <TextBox HorizontalAlignment="Stretch" x:Name="SearchText"></TextBox>
+                        <CheckBox IsChecked="{Binding SearchCaseSensitive}">Case sensitive</CheckBox>
                         <StackPanel Orientation="Horizontal">
                             <Button Command="{Binding SearchBackwardCommand}" CommandParameter="{Binding ElementName=SearchText, Path=Text}">Up</Button>
                             <Button Command="{Binding SearchForwardCommand}" CommandParameter="{Binding ElementName=SearchText, Path=Text}">Down</Button>
