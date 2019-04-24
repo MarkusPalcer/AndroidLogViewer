@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -553,7 +552,7 @@ namespace AndroidLogViewer
 
         private bool MatchesSearch(LogEntry entry, string searchText)
         {
-            return entry.Message.Contains(searchText);
+            return entry.Message.Contains(searchText) || entry.Tag.Contains(searchText);
         }
 
         #endregion
