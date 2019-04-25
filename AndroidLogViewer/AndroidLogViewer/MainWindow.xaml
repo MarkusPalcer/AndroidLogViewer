@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AndroidLogViewer"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="Android Log Viewer" Height="450" Width="800"
         x:Name="Root">
     <Window.Resources>
         <Style TargetType="Control" x:Key="MonospaceFont">
@@ -32,7 +32,11 @@
               Grid.ColumnSpan="2">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding OpenFileCommand}" />
+                <MenuItem Header="Open _URL" Command="{Binding OpenUrlCommand}" />
+                <Separator />
                 <MenuItem Header="_Export filtered log" Command="{Binding ExportCommand}" />
+                <Separator />
+                <MenuItem Header="E_xit" Click="CloseWindow" />
             </MenuItem>
         </Menu>
 

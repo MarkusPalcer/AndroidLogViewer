@@ -1,15 +1,19 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using AndroidLogViewer.Annotations;
+using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using Prism.Commands;
 
@@ -48,12 +52,14 @@ namespace AndroidLogViewer
             ExportCommand = new DelegateCommand(ExportFile, () => !string.IsNullOrEmpty(FileName)).ObservesProperty(() => FileName);
 
             OpenFileCommand = new DelegateCommand(OpenFile);
+            OpenUrlCommand = new DelegateCommand(OpenUrl);
 
             WhitelistedProcessThreadFilters.CollectionChanged += RefreshView;
             BlacklistedProcessThreadFilters.CollectionChanged += RefreshView;
             WhitelistedTags.CollectionChanged += RefreshView;
             BlacklistedTags.CollectionChanged += RefreshView;
         }
+
 
         private void ExportFile()
         {
@@ -451,18 +457,59 @@ namespace AndroidLogViewer
             var dialogResult = dlg.ShowDialog();
             if (!dialogResult.HasValue || !dialogResult.Value) return;
 
-            FileName = dlg.FileName;
+            
 
+            using (var reader = File.OpenText(dlg.FileName))
+            {
+                FileName = dlg.FileName;
+                await ProcessLogData(reader);
+            }
+        }
+
+        private async void OpenUrl()
+        {
+            var address = Interaction.InputBox("Please enter the URL to load", "Open URL", string.Empty);
+            if (string.IsNullOrEmpty(address)) return;
+
+            using (var webClient = new WebClient())
+            {
+                Stream stream;
+                try
+                {
+                    stream = webClient.OpenRead(address);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    return;
+                }
+
+                if (stream == null) return;
+
+                using (var reader = new StreamReader(stream))
+                {
+                    FileName = address;
+                    await ProcessLogData(reader);
+                }
+            }
+        }
+
+        private async Task ProcessLogData(StreamReader reader)
+        {
             LogEntries = null;
             AvailableProcessThreadFilters = null;
 
             BlacklistedProcessThreadFilters.Clear();
             WhitelistedProcessThreadFilters.Clear();
 
-            LogEntries = await Task<ObservableCollection<LogEntry>>.Factory.StartNew(() => ReadLogEntries(dlg.FileName));
-            AvailableProcessThreadFilters = await Task<ObservableCollection<ProcessThreadFilter>>.Factory.StartNew(GenerateProcessThreadFilters);
-            AvailableTags = new ObservableCollection<string>(await Task<string[]>.Factory.StartNew(() => LogEntries.Select(x => x.Tag).Distinct().OrderBy(x => x).ToArray()));
+            LogEntries = await Task<ObservableCollection<LogEntry>>.Factory.StartNew(() => ReadLogEntries(reader));
+            AvailableProcessThreadFilters =
+                await Task<ObservableCollection<ProcessThreadFilter>>.Factory.StartNew(GenerateProcessThreadFilters);
+            AvailableTags = new ObservableCollection<string>(
+                await Task<string[]>.Factory.StartNew(() =>
+                    LogEntries.Select(x => x.Tag).Distinct().OrderBy(x => x).ToArray()));
         }
+
 
         private ObservableCollection<ProcessThreadFilter> GenerateProcessThreadFilters()
         {
@@ -497,38 +544,38 @@ namespace AndroidLogViewer
             return result;
         }
 
-        private ObservableCollection<LogEntry> ReadLogEntries(string fileName)
+        private static ObservableCollection<LogEntry> ReadLogEntries(StreamReader reader)
         {
-            using (var reader = File.OpenText(fileName))
+            var result = new ObservableCollection<LogEntry>();
+
+            var line = reader.ReadLine();
+            var regex = new Regex(
+                "^(?<datetime>\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d.\\d\\d\\d)\\s+(?<pid>\\d+)\\s+(?<tid>\\d+)\\s+(?<level>\\w)\\s+(?<tag>[^:]+):\\s(?<message>.*)$",
+                RegexOptions.Compiled);
+
+            while (line != null)
             {
-                var result = new ObservableCollection<LogEntry>();
+                var matches = regex.Matches(line);
 
-                var line = reader.ReadLine();
-                var regex = new Regex("^(?<datetime>\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d.\\d\\d\\d)\\s+(?<pid>\\d+)\\s+(?<tid>\\d+)\\s+(?<level>\\w)\\s+(?<tag>[^:]+):\\s(?<message>.*)$", RegexOptions.Compiled);
-
-                while (line != null)
+                foreach (Match match in matches)
                 {
-                    var matches = regex.Matches(line);
-
-                    foreach (Match match in matches)
+                    result.Add(new LogEntry
                     {
-                        result.Add(new LogEntry
-                        {
-                            Message = match.Groups["message"].Value,
-                            Level = match.Groups["level"].Value,
-                            Process = int.Parse(match.Groups["pid"].Value),
-                            Thread = int.Parse(match.Groups["tid"].Value),
-                            Tag = match.Groups["tag"].Value,
-                            Time = match.Groups["datetime"].Value,
-                        });
-                    }
-
-                    line = reader.ReadLine();
+                        Message = match.Groups["message"].Value,
+                        Level = match.Groups["level"].Value,
+                        Process = int.Parse(match.Groups["pid"].Value),
+                        Thread = int.Parse(match.Groups["tid"].Value),
+                        Tag = match.Groups["tag"].Value,
+                        Time = match.Groups["datetime"].Value,
+                    });
                 }
 
-                return result;
+                line = reader.ReadLine();
             }
+
+            return result;
         }
+
         #endregion
 
         #region Search
@@ -551,6 +598,8 @@ namespace AndroidLogViewer
         public LogEntry SelectedLogEntry { get; set; }
 
         public bool SearchCaseSensitive { get; set; } = false;
+
+        public ICommand OpenUrlCommand { get; }
 
         private bool MatchesSearch(LogEntry entry, string searchText)
         {

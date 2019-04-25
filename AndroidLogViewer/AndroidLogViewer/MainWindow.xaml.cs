@@ -26,5 +26,10 @@ namespace AndroidLogViewer
 
             LogItems.SelectionChanged += (sender, args) => LogItems.ScrollIntoView(LogItems.SelectedItem);
         }
+
+        private void CloseWindow(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }
