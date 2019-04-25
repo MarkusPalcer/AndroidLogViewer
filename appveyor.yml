@@ -50,7 +50,7 @@ deploy:
 init:
   # Set "build version number" from the tag name when applicable
   - ps: >-
-      if ($env:APPVEYOR_REPO_TAG -eq "true")
+      if ($env:APPVEYOR_REPO_TAG -eq "true" -and $env:APPVEYOR_REPO_TAG.StartsWith("v"))
           {
             Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_TAG_NAME.TrimStart("v"))"
           }
