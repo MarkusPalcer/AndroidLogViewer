@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product 
+	  Id="742A5624-208E-46A5-A696-7FCD35CA2348" 
+	  Name="Android Log Viewer" 
+	  Language="1033" 
+	  Version="1.0.0.0" 
+	  Manufacturer="Markus Palcer" 
+	  UpgradeCode="26497f95-ef04-4536-b8e4-5a544effdcac">
+
+	  <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+		<MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+		<MediaTemplate />
+
+    <FeatureRef Id="Complete" />
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="Android Log Viewer" />
+			</Directory>
+
+		  <Directory Id="ProgramMenuFolder">
+		    <Directory Id="ProgramMenuDir" Name="Android Log Viewer">
+		      <Component Id="ProgramMenuDir" Guid="1F2B3CBB-F25D-4321-A6D2-5D97A1551004">
+		        <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+		        <RegistryValue Root='HKCU' Key='Software\Markus Palcer\AndroidLogViewer' Name="installed" Type="integer" Value="1" KeyPath="yes" />
+		      </Component>
+		    </Directory>
+		  </Directory>
+
+		  <Directory Id="DesktopFolder" />
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+	  <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="MainExecutable" Guid="BE16E099-415B-45CA-A89F-5A911A3431A3">
+        <File Id="AndroidLogViewer.exe" Name="$(var.AndroidLogViewer.TargetFileName)" Source="$(var.AndroidLogViewer.TargetPath)" KeyPath='yes'>
+          <Shortcut Id="ApplicationStartMenuShortcut" 
+                    Name="Android Log Viewer"
+                    WorkingDirectory="APPLICATIONROOTDIRECTORY" 
+                    Directory="ProgramMenuDir"
+                    Advertise="yes" />
+        </File>
+      </Component> 
+		</DirectoryRef>
+	</Fragment>
+
+  <Fragment>
+    <Feature Id='Complete' Level='1'>
+      <ComponentRef Id='MainExecutable' />
+      <ComponentRef Id='ProgramMenuDir'/>
+    </Feature>
+  </Fragment>
+</Wix>
