@@ -10,6 +10,11 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\Inst
 		{58C84F20-AB67-4A66-AAD9-9A07A73BDC0A} = {58C84F20-AB67-4A66-AAD9-9A07A73BDC0A}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution files", "Solution files", "{A3F8FEE4-14BB-4180-9E9A-E023084377E1}"
+	ProjectSection(SolutionItems) = preProject
+		..\appveyor.yml = ..\appveyor.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
