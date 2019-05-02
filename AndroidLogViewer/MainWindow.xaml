@@ -16,238 +16,303 @@
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
+
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" ></RowDefinition>
-        </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="4*" />
-        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
 
-        <Menu Grid.Row="0"
-              Grid.Column="0"
-              Grid.ColumnSpan="2">
-            <MenuItem Header="_File">
-                <MenuItem Header="_Open" Command="{Binding OpenFileCommand}" />
-                <MenuItem Header="Open _URL" Command="{Binding OpenUrlCommand}" />
-                <Separator />
-                <MenuItem Header="_Export filtered log" Command="{Binding ExportCommand}" />
-                <Separator />
-                <MenuItem Header="E_xit" Click="CloseWindow" />
-            </MenuItem>
-        </Menu>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="4*" />
+            </Grid.ColumnDefinitions>
 
-        <ScrollViewer Grid.Row="1"
-                      Grid.Column="0"
-                      HorizontalScrollBarVisibility="Hidden"
-                      VerticalScrollBarVisibility="Auto">
+            <Menu Grid.Row="0"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="2">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Open" Command="{Binding OpenFileCommand}" />
+                    <MenuItem Header="Open _URL" Command="{Binding OpenUrlCommand}" />
+                    <Separator />
+                    <MenuItem Header="_Export filtered log" Command="{Binding ExportCommand}" />
+                    <Separator />
+                    <MenuItem Header="E_xit" Click="CloseWindow" />
+                </MenuItem>
+            </Menu>
 
-            <StackPanel Orientation="Vertical">
-                <GroupBox Header="Search">
-                    <StackPanel Orientation="Vertical">
-                        <TextBox HorizontalAlignment="Stretch" x:Name="SearchText"></TextBox>
-                        <CheckBox IsChecked="{Binding SearchCaseSensitive}">Case sensitive</CheckBox>
-                        <StackPanel Orientation="Horizontal">
-                            <Button Command="{Binding SearchBackwardCommand}" CommandParameter="{Binding ElementName=SearchText, Path=Text}">Up</Button>
-                            <Button Command="{Binding SearchForwardCommand}" CommandParameter="{Binding ElementName=SearchText, Path=Text}">Down</Button>
+            <ScrollViewer Grid.Row="1"
+                          Grid.Column="0"
+                          HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollBarVisibility="Auto">
+
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Header="Search">
+                        <StackPanel Orientation="Vertical">
+                            <TextBox HorizontalAlignment="Stretch" x:Name="SearchText"></TextBox>
+                            <CheckBox IsChecked="{Binding SearchCaseSensitive}">Case sensitive</CheckBox>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Command="{Binding SearchBackwardCommand}"
+                                        CommandParameter="{Binding ElementName=SearchText, Path=Text}">
+                                    Up
+                                </Button>
+                                <Button Command="{Binding SearchForwardCommand}"
+                                        CommandParameter="{Binding ElementName=SearchText, Path=Text}">
+                                    Down
+                                </Button>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </GroupBox>
-                <GroupBox Header="Processes/Threads">
-                    <StackPanel Orientation="Vertical">
-                        <ItemsControl ItemsSource="{Binding WhitelistedProcessThreadFilters}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical"></StackPanel>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="{x:Type local:ProcessThreadFilter}">
-                                    <DockPanel LastChildFill="True">
-                                        <Button Content="X" Command="{Binding ElementName=Root, Path=DataContext.RemoveWhitelistedProcessThreadFilterCommand}" CommandParameter="{Binding}" />
-                                        <TextBlock Text="{Binding}" />
-                                    </DockPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <ItemsControl ItemsSource="{Binding BlacklistedProcessThreadFilters}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical"></StackPanel>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="{x:Type local:ProcessThreadFilter}">
-                                    <DockPanel LastChildFill="True">
-                                        <Button Content="X" Command="{Binding ElementName=Root, Path=DataContext.RemoveBlacklistedProcessThreadFilterCommand}" CommandParameter="{Binding}" />
-                                        <TextBlock Text="!" />
-                                        <TextBlock Text="{Binding}" />
-                                    </DockPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <DockPanel LastChildFill="True">
-                            <Button CommandParameter="{Binding ElementName=SelectedProcessThreadFilter, Path=SelectedItem}"
-                                DockPanel.Dock="Right"
-                                Command="{Binding AddWhitelistedProcessThreadFilterCommand}">Whitelist</Button>
-
-                            <Button CommandParameter="{Binding ElementName=SelectedProcessThreadFilter, Path=SelectedItem}"
+                    </GroupBox>
+                    <GroupBox Header="Processes/Threads">
+                        <StackPanel Orientation="Vertical">
+                            <ItemsControl ItemsSource="{Binding WhitelistedProcessThreadFilters}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"></StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type local:ProcessThreadFilter}">
+                                        <DockPanel LastChildFill="True">
+                                            <Button Content="X"
+                                                    Command="{Binding ElementName=Root, Path=DataContext.RemoveWhitelistedProcessThreadFilterCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            <TextBlock Text="{Binding}" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <ItemsControl ItemsSource="{Binding BlacklistedProcessThreadFilters}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"></StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type local:ProcessThreadFilter}">
+                                        <DockPanel LastChildFill="True">
+                                            <Button Content="X"
+                                                    Command="{Binding ElementName=Root, Path=DataContext.RemoveBlacklistedProcessThreadFilterCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            <TextBlock Text="!" />
+                                            <TextBlock Text="{Binding}" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <DockPanel LastChildFill="True">
+                                <Button
+                                    CommandParameter="{Binding ElementName=SelectedProcessThreadFilter, Path=SelectedItem}"
                                     DockPanel.Dock="Right"
-                                    Command="{Binding AddBlacklistedProcessThreadFilterCommand}">Blacklist</Button>
+                                    Command="{Binding AddWhitelistedProcessThreadFilterCommand}">
+                                    Whitelist
+                                </Button>
 
-                            <ComboBox x:Name="SelectedProcessThreadFilter"
-                                  ItemsSource="{Binding AvailableProcessThreadFilters}" />
-
-                        </DockPanel>
-                    </StackPanel>
-                </GroupBox>
-                <GroupBox Header="Tags">
-                    <StackPanel Orientation="Vertical">
-                        <ItemsControl ItemsSource="{Binding WhitelistedTags}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical"></StackPanel>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="{x:Type system:String}">
-                                    <DockPanel LastChildFill="True">
-                                        <Button Content="X" Command="{Binding ElementName=Root, Path=DataContext.RemoveWhitelistedTagCommand}" CommandParameter="{Binding}" />
-                                        <TextBlock Text="{Binding}" />
-                                    </DockPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <ItemsControl ItemsSource="{Binding BlacklistedTags}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical"></StackPanel>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="{x:Type system:String}">
-                                    <DockPanel LastChildFill="True">
-                                        <Button Content="X" Command="{Binding ElementName=Root, Path=DataContext.RemoveBlacklistedTagCommand}" CommandParameter="{Binding}" />
-                                        <TextBlock Text="!" />
-                                        <TextBlock Text="{Binding}" />
-                                    </DockPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <DockPanel LastChildFill="True">
-                            <Button CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
+                                <Button
+                                    CommandParameter="{Binding ElementName=SelectedProcessThreadFilter, Path=SelectedItem}"
                                     DockPanel.Dock="Right"
-                                    Command="{Binding AddWhitelistedTagCommand}">Whitelist</Button>
-                            <Button CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
-                                    DockPanel.Dock="Right"
-                                    Command="{Binding AddBlacklistedTagCommand}">Blacklist</Button>
+                                    Command="{Binding AddBlacklistedProcessThreadFilterCommand}">
+                                    Blacklist
+                                </Button>
 
-                            <ComboBox x:Name="SelectedTag"
-                                      ItemsSource="{Binding AvailableTags}" />
+                                <ComboBox x:Name="SelectedProcessThreadFilter"
+                                          ItemsSource="{Binding AvailableProcessThreadFilters}" />
 
-                        </DockPanel>
-                    </StackPanel>
-                </GroupBox>
+                            </DockPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="Tags">
+                        <StackPanel Orientation="Vertical">
+                            <ItemsControl ItemsSource="{Binding WhitelistedTags}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"></StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type system:String}">
+                                        <DockPanel LastChildFill="True">
+                                            <Button Content="X"
+                                                    Command="{Binding ElementName=Root, Path=DataContext.RemoveWhitelistedTagCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            <TextBlock Text="{Binding}" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <ItemsControl ItemsSource="{Binding BlacklistedTags}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"></StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type system:String}">
+                                        <DockPanel LastChildFill="True">
+                                            <Button Content="X"
+                                                    Command="{Binding ElementName=Root, Path=DataContext.RemoveBlacklistedTagCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            <TextBlock Text="!" />
+                                            <TextBlock Text="{Binding}" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <DockPanel LastChildFill="True">
+                                <Button CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
+                                        DockPanel.Dock="Right"
+                                        Command="{Binding AddWhitelistedTagCommand}">
+                                    Whitelist
+                                </Button>
+                                <Button CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
+                                        DockPanel.Dock="Right"
+                                        Command="{Binding AddBlacklistedTagCommand}">
+                                    Blacklist
+                                </Button>
 
-                <GroupBox Header="Log Level">
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding ShowVerbose}">V</CheckBox>
-                        <CheckBox IsChecked="{Binding ShowDebug}">D</CheckBox>
-                        <CheckBox IsChecked="{Binding ShowInfo}">I</CheckBox>
-                        <CheckBox IsChecked="{Binding ShowWarn}">W</CheckBox>
-                        <CheckBox IsChecked="{Binding ShowError}">E</CheckBox>
-                    </StackPanel>
-                </GroupBox>
-            </StackPanel>
-        </ScrollViewer>
+                                <ComboBox x:Name="SelectedTag"
+                                          ItemsSource="{Binding AvailableTags}" />
 
-        
+                            </DockPanel>
+                        </StackPanel>
+                    </GroupBox>
 
-        <ListView x:Name="LogItems"
-                  Grid.Row="1"
-                  Grid.Column="1"
-                  ItemsSource="{Binding LogEntries}"
-                  Style="{StaticResource MonospaceFont}"
-                  SelectedIndex="{Binding SelectedLogEntryIndex}"
-                  SelectedItem="{Binding Path=SelectedLogEntry, Mode=OneWayToSource}">
-            <ListView.Resources>
-                <ContextMenu x:Key="ItemContextMenu">
-                    <MenuItem Command="{Binding Path=DataContext.ShowOnlyProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
-                        <MenuItem.Header>
-                            <TextBlock
-                                Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this process ({0}/*)'}">
-                            </TextBlock>
-                        </MenuItem.Header>
-                    </MenuItem>
-                    <MenuItem Command="{Binding Path=DataContext.ShowOnlyThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
-                        <MenuItem.Header>
-                            <TextBlock>
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="Show only this thread ({0}/{1})" > 
-                                        <Binding Path="SelectedItem.Process" RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
-                                        <Binding Path="SelectedItem.Thread" RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
-                                    </MultiBinding> 
-                                </TextBlock.Text>
-                            </TextBlock>
-                        </MenuItem.Header>
-                    </MenuItem>
-                    <MenuItem Command="{Binding Path=DataContext.HideProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
-                        <MenuItem.Header>
-                            <TextBlock
-                                Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this process ({0}/*)'}">
-                            </TextBlock>
-                        </MenuItem.Header>
-                    </MenuItem>
-                    <MenuItem Command="{Binding Path=DataContext.HideThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
-                        <MenuItem.Header>
-                            <TextBlock>
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="Hide this thread ({0}/{1})" > 
-                                        <Binding Path="SelectedItem.Process" RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
-                                        <Binding Path="SelectedItem.Thread" RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
-                                    </MultiBinding> 
-                                </TextBlock.Text>
-                            </TextBlock>
-                        </MenuItem.Header>
-                    </MenuItem>
+                    <GroupBox Header="Log Level">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding ShowVerbose}">V</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowDebug}">D</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowInfo}">I</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowWarn}">W</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowError}">E</CheckBox>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </ScrollViewer>
 
-                    <MenuItem Command="{Binding Path=DataContext.ShowOnlyTagForSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
-                        <MenuItem.Header>
-                            <TextBlock
-                                Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this tag ({0})'}">
-                            </TextBlock>
-                        </MenuItem.Header>
-                    </MenuItem>
 
-                    <MenuItem Command="{Binding Path=DataContext.HideTagOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
-                        <MenuItem.Header>
-                            <TextBlock
-                                Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this tag ({0})'}">
-                            </TextBlock>
-                        </MenuItem.Header>
-                    </MenuItem>
-                </ContextMenu>
-            </ListView.Resources>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Path=Time}" />
-                    <GridViewColumn Header="PID" DisplayMemberBinding="{Binding Path=Process}" />
-                    <GridViewColumn Header="TID" DisplayMemberBinding="{Binding Path=Thread}" />
-                    <GridViewColumn Header="" DisplayMemberBinding="{Binding Path=Level}" />
-                    <GridViewColumn Header="Tag" DisplayMemberBinding="{Binding Path=Tag}"></GridViewColumn>
-                    <GridViewColumn Header="Message" DisplayMemberBinding="{Binding Path=Message}" />
-                </GridView>
-            </ListView.View>
-            <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}">
-                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                </Style>
-            </ListView.ItemContainerStyle>
-        </ListView>
+            <ListView x:Name="LogItems"
+                      Grid.Row="1"
+                      Grid.Column="1"
+                      ItemsSource="{Binding LogEntries}"
+                      Style="{StaticResource MonospaceFont}"
+                      SelectedIndex="{Binding SelectedLogEntryIndex}"
+                      SelectedItem="{Binding Path=SelectedLogEntry, Mode=OneWayToSource}">
+                <ListView.Resources>
+                    <ContextMenu x:Key="ItemContextMenu">
+                        <MenuItem
+                            Command="{Binding Path=DataContext.ShowOnlyProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            <MenuItem.Header>
+                                <TextBlock
+                                    Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this process ({0}/*)'}">
+                                </TextBlock>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding Path=DataContext.ShowOnlyThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            <MenuItem.Header>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="Show only this thread ({0}/{1})">
+                                            <Binding Path="SelectedItem.Process"
+                                                     RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
+                                            <Binding Path="SelectedItem.Thread"
+                                                     RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding Path=DataContext.HideProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            <MenuItem.Header>
+                                <TextBlock
+                                    Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this process ({0}/*)'}">
+                                </TextBlock>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding Path=DataContext.HideThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            <MenuItem.Header>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="Hide this thread ({0}/{1})">
+                                            <Binding Path="SelectedItem.Process"
+                                                     RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
+                                            <Binding Path="SelectedItem.Thread"
+                                                     RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </MenuItem.Header>
+                        </MenuItem>
 
-        <GridSplitter Grid.Row="1" Grid.Column="1" ResizeDirection="Columns" Width="5" VerticalAlignment="Stretch" HorizontalAlignment="Left" />
+                        <MenuItem
+                            Command="{Binding Path=DataContext.ShowOnlyTagForSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            <MenuItem.Header>
+                                <TextBlock
+                                    Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this tag ({0})'}">
+                                </TextBlock>
+                            </MenuItem.Header>
+                        </MenuItem>
+
+                        <MenuItem
+                            Command="{Binding Path=DataContext.HideTagOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            <MenuItem.Header>
+                                <TextBlock
+                                    Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this tag ({0})'}">
+                                </TextBlock>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </ContextMenu>
+                </ListView.Resources>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Path=Time}" />
+                        <GridViewColumn Header="PID" DisplayMemberBinding="{Binding Path=Process}" />
+                        <GridViewColumn Header="TID" DisplayMemberBinding="{Binding Path=Thread}" />
+                        <GridViewColumn Header="" DisplayMemberBinding="{Binding Path=Level}" />
+                        <GridViewColumn Header="Tag" DisplayMemberBinding="{Binding Path=Tag}"></GridViewColumn>
+                        <GridViewColumn Header="Message" DisplayMemberBinding="{Binding Path=Message}" />
+                    </GridView>
+                </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+
+            <GridSplitter Grid.Row="1" Grid.Column="1" ResizeDirection="Columns" Width="5" VerticalAlignment="Stretch"
+                          HorizontalAlignment="Left" />
+        </Grid>
+
+        <Grid x:Name="ActivityMessageOverlay"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              Background="#80000000">
+            <Grid.Visibility>
+                <Binding Path="IsWorking">
+                    <Binding.Converter>
+                        <BooleanToVisibilityConverter />
+                    </Binding.Converter>
+                </Binding>
+            </Grid.Visibility>
+            <Grid 
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Center">
+                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="White" RadiusX="10" RadiusY="10" />
+                <StackPanel Margin="20" Orientation="Vertical">
+                    <TextBlock FontSize="16">Working...</TextBlock>
+                    <TextBlock>Please wait until the current operation finishes.</TextBlock>
+                    <ProgressBar Orientation="Horizontal" IsIndeterminate="True" />
+                </StackPanel>
+                
+            </Grid>
+            
+        </Grid>
+
     </Grid>
+
 </Window>

@@ -105,6 +105,17 @@ namespace AndroidLogViewer
             }
         }
 
+        public bool IsWorking
+        {
+            get => _isWorking;
+            set
+            {
+                if (value == _isWorking) return;
+                _isWorking = value;
+                OnPropertyChanged();
+            }
+        }
+
         private void RefreshView(object sender, NotifyCollectionChangedEventArgs args)
         {
             // Try to find the entry in the filtered list or select the first item that comes after it.
@@ -380,6 +391,7 @@ namespace AndroidLogViewer
         private bool _showError = true;
         private int _selectedLogEntryIndex;
         private string _fileName;
+        private bool _isWorking = false;
 
         public bool ShowVerbose
         {
@@ -456,13 +468,20 @@ namespace AndroidLogViewer
 
             var dialogResult = dlg.ShowDialog();
             if (!dialogResult.HasValue || !dialogResult.Value) return;
-
             
 
             using (var reader = File.OpenText(dlg.FileName))
             {
-                FileName = dlg.FileName;
-                await ProcessLogData(reader);
+                IsWorking = true;
+                try
+                {
+                    FileName = dlg.FileName;
+                    await ProcessLogData(reader);
+                }
+                finally
+                {
+                    IsWorking = false;
+                }
             }
         }
 
@@ -488,8 +507,16 @@ namespace AndroidLogViewer
 
                 using (var reader = new StreamReader(stream))
                 {
-                    FileName = address;
-                    await ProcessLogData(reader);
+                    IsWorking = true;
+                    try
+                    {
+                        FileName = address;
+                        await ProcessLogData(reader);
+                    }
+                    finally
+                    {
+                        IsWorking = false;
+                    }
                 }
             }
         }
