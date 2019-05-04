@@ -9,10 +9,17 @@
         Title="Android Log Viewer" Height="450" Width="800"
         x:Name="Root">
     <Window.Resources>
-        <Style TargetType="Control" x:Key="MonospaceFont">
-            <Setter Property="FontFamily" Value="Lucida Console"></Setter>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Dialogs/Dialogs.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="Control" x:Key="MonospaceFont">
+                <Setter Property="FontFamily" Value="Lucida Console"></Setter>
+            </Style>
+        </ResourceDictionary>
     </Window.Resources>
+
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
@@ -288,31 +295,21 @@
                           HorizontalAlignment="Left" />
         </Grid>
 
-        <Grid x:Name="ActivityMessageOverlay"
-              HorizontalAlignment="Stretch"
+        <Grid HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
               Background="#80000000">
-            <Grid.Visibility>
-                <Binding Path="IsWorking">
-                    <Binding.Converter>
-                        <BooleanToVisibilityConverter />
-                    </Binding.Converter>
-                </Binding>
-            </Grid.Visibility>
-            <Grid 
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Center">
-                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="White" RadiusX="10" RadiusY="10" />
-                <StackPanel Margin="20" Orientation="Vertical">
-                    <TextBlock FontSize="16">Working...</TextBlock>
-                    <TextBlock>Please wait until the current operation finishes.</TextBlock>
-                    <ProgressBar Orientation="Horizontal" IsIndeterminate="True" />
-                </StackPanel>
-                
-            </Grid>
-            
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Setter Property="Visibility" Value="Visible" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding ActiveDialog}" Value="{x:Null}">
+                        <Setter Property="Visibility" Value="Hidden" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
+            <ContentControl ContentTemplate="{StaticResource DialogTemplate}" Content="{Binding ActiveDialog}"/>
         </Grid>
-
     </Grid>
 
 </Window>

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Reflection;
 
-namespace Prism.Commands
+namespace AndroidLogViewer.Command
 {
     /// <summary>
     /// Represents each node of nested properties expression and takes care of 

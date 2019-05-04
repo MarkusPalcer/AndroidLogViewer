@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 
-namespace Prism.Commands
+namespace AndroidLogViewer.Command
 {
     /// <summary>
     /// Provide a way to observe property changes of INotifyPropertyChanged objects and invokes a 

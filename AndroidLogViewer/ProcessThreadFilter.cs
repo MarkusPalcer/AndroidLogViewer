@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using AndroidLogViewer.Annotations;
+using AndroidLogViewer.Properties;
 
 namespace AndroidLogViewer
 {
