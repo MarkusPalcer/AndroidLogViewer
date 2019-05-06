@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <?define ProductName="!(fileVersion.ProductName($(var.AndroidLogViewer.TargetPath)))" ?>
-  <?define CompanyName="!(fileVersion.CompanyName($(var.AndroidLogViewer.TargetPath)))" ?>
 
   <Product 
 	  Id="742A5624-208E-46A5-A696-7FCD35CA2348" 
-	  Name="$(var.ProductName)" 
+	  Name="Android Log Viewer" 
 	  Language="1033" 
 	  Version="!(bind.fileVersion.AndroidLogViewer.exe)" 
-	  Manufacturer="$(var.CompanyName)" 
+	  Manufacturer="Markus Palcer" 
 	  UpgradeCode="26497f95-ef04-4536-b8e4-5a544effdcac">
 
+    
 	  <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 		<MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
-		<MediaTemplate />
+    <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
 
     <FeatureRef Id="Complete" />
 	</Product>
