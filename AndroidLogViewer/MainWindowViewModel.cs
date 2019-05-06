@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using AndroidLogViewer.Annotations;
-using Microsoft.VisualBasic;
+using AndroidLogViewer.Command;
+using AndroidLogViewer.Dialogs;
+using AndroidLogViewer.Properties;
 using Microsoft.Win32;
-using Prism.Commands;
 
 namespace AndroidLogViewer
 {
@@ -60,40 +60,6 @@ namespace AndroidLogViewer
             BlacklistedTags.CollectionChanged += RefreshView;
         }
 
-
-        private void ExportFile()
-        {
-            var dlg = new SaveFileDialog
-            {
-                CheckPathExists = true,
-                Title = "Select logcat file",
-                RestoreDirectory = true,
-                OverwritePrompt = true,
-            };
-
-            var dialogResult = dlg.ShowDialog();
-            if (!dialogResult.HasValue || !dialogResult.Value) return;
-
-
-            var entries = _defaultView.OfType<LogEntry>().ToArray();
-            
-            var dateTimeLength = entries.Max(x => x.Time.Length);
-            var pidLength = entries.Max(x => x.Process.ToString().Length);
-            var tidLength = entries.Max(x => x.Thread.ToString().Length);
-            var tagLength = entries.Max(x => x.Tag.Length);
-
-            var lines = entries.Select(x =>
-                string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}",
-                    new string(' ', ExportFieldPadding),
-                    x.Time.PadRight(dateTimeLength),
-                    x.Process.ToString().PadRight(pidLength),
-                    x.Thread.ToString().PadRight(tidLength),
-                    x.Level,
-                    x.Tag.PadRight(tagLength),
-                    x.Message));
-            File.WriteAllLines(dlg.FileName, lines);
-        }
-
         public string FileName
         {
             get => _fileName;
@@ -101,17 +67,6 @@ namespace AndroidLogViewer
             {
                 if (value == _fileName) return;
                 _fileName = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool IsWorking
-        {
-            get => _isWorking;
-            set
-            {
-                if (value == _isWorking) return;
-                _isWorking = value;
                 OnPropertyChanged();
             }
         }
@@ -153,6 +108,121 @@ namespace AndroidLogViewer
                 }
             }
         }
+
+        public IEnumerable<LogEntry> LogEntries
+        {
+            get => _logEntries;
+            private set
+            {
+                if (Equals(value, _logEntries)) return;
+                _logEntries = value;
+
+
+                _defaultView = CollectionViewSource.GetDefaultView(_logEntries);
+                if (_defaultView != null) {
+                    _defaultView.Filter = FilterLogEntries;
+                }
+
+                OnPropertyChanged();
+            }
+        }
+
+        private bool FilterLogEntries(object x)
+        {
+            if (!(x is LogEntry entry)) return false;
+
+            if (WhitelistedProcessThreadFilters.Any() && !WhitelistedProcessThreadFilters.Any(f => f.Matches(entry))) return false;
+            if (BlacklistedProcessThreadFilters.Any(f => f.Matches(entry))) return false;
+            if (WhitelistedTags.Any() && !WhitelistedTags.Any(t => entry.Tag.Equals(t))) return false;
+            if (BlacklistedTags.Any(t => entry.Tag.Equals(t))) return false;
+            if (!ShowDebug && entry.Level.Equals("D")) return false;
+            if (!ShowError && entry.Level.Equals("E")) return false;
+            if (!ShowInfo && entry.Level.Equals("I")) return false;
+            if (!ShowVerbose && entry.Level.Equals("V")) return false;
+            if (!ShowWarn && entry.Level.Equals("W")) return false;
+
+            return true;
+        }
+
+        #region Export
+        public ICommand ExportCommand { get; }
+        
+        private void ExportFile()
+        {
+            var dlg = new SaveFileDialog
+            {
+                CheckPathExists = true,
+                Title = "Select logcat file",
+                RestoreDirectory = true,
+                OverwritePrompt = true,
+            };
+
+            var dialogResult = dlg.ShowDialog();
+            if (!dialogResult.HasValue || !dialogResult.Value) return;
+
+
+            var entries = _defaultView.OfType<LogEntry>().ToArray();
+            
+            var dateTimeLength = entries.Max(x => x.Time.Length);
+            var pidLength = entries.Max(x => x.Process.ToString().Length);
+            var tidLength = entries.Max(x => x.Thread.ToString().Length);
+            var tagLength = entries.Max(x => x.Tag.Length);
+
+            var lines = entries.Select(x =>
+                string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}",
+                    new string(' ', ExportFieldPadding),
+                    x.Time.PadRight(dateTimeLength),
+                    x.Process.ToString().PadRight(pidLength),
+                    x.Thread.ToString().PadRight(tidLength),
+                    x.Level,
+                    x.Tag.PadRight(tagLength),
+                    x.Message));
+            File.WriteAllLines(dlg.FileName, lines);
+        }
+        #endregion
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+
+        #region Process/Thread filtering
+        private ObservableCollection<ProcessThreadFilter> _availableProcessThreadFilters;
+
+        public ObservableCollection<ProcessThreadFilter> AvailableProcessThreadFilters
+        {
+            get => _availableProcessThreadFilters;
+            set
+            {
+                if (Equals(value, _availableProcessThreadFilters)) return;
+                _availableProcessThreadFilters = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<ProcessThreadFilter> WhitelistedProcessThreadFilters { get; } = new ObservableCollection<ProcessThreadFilter>();
+        public ObservableCollection<ProcessThreadFilter> BlacklistedProcessThreadFilters { get; } = new ObservableCollection<ProcessThreadFilter>();
+
+        public ICommand AddWhitelistedProcessThreadFilterCommand { get; }
+
+        public ICommand RemoveWhitelistedProcessThreadFilterCommand { get; }
+
+        public ICommand AddBlacklistedProcessThreadFilterCommand { get; }
+
+        public ICommand RemoveBlacklistedProcessThreadFilterCommand { get; }
+
+        public ICommand ShowOnlyThreadOfSelectedItemCommand { get; private set; }
+
+        public ICommand ShowOnlyProcessOfSelectedItemCommand { get; private set; }
+
+        public ICommand HideThreadOfSelectedItemCommand { get; private set; }
+
+        public ICommand HideProcessOfSelectedItemCommand { get; private set; }
 
         private void HideThreadOfSelectedItem()
         {
@@ -200,154 +270,8 @@ namespace AndroidLogViewer
             WhitelistedProcessThreadFilters.Remove(f);
         }
 
-        private void HideTagOfSelectedItem()
-        {
-            var entry = SelectedLogEntry;
-            BlacklistedTags.Add(entry.Tag);
-        }
-
-        private void AddBlacklistedTag(string tag)
-        {
-            BlacklistedTags.Add(tag);
-        }
-
-        private void RemoveBlacklistedTag(string tag)
-        {
-            BlacklistedTags.Remove(tag);
-        }
-
-        private void ShowOnlyTagForSelectedItem()
-        {
-            var entry = SelectedLogEntry;
-            WhitelistedTags.Clear();
-            WhitelistedTags.Add(entry.Tag);
-        }
-
-        private void AddWhitelistedTag(string tag)
-        {
-            WhitelistedTags.Add(tag);
-        }
-
-        private void RemoveWhitelistedTag(string tag)
-        {
-            WhitelistedTags.Remove(tag);
-        }
-
-        private void SearchBackward(string searchText)
-        {
-            if (_defaultView == null) return;
-
-            var items = _defaultView.OfType<LogEntry>().ToArray();
-
-            var newIndex = SelectedLogEntryIndex;
-            while (newIndex > 0)
-            {
-                newIndex--;
-                if (MatchesSearch(items[newIndex], searchText))
-                {
-                    SelectedLogEntryIndex = newIndex;
-                    break;
-                }
-            }
-        }
-
-        private void SearchForward(string searchText)
-        {
-            if (_defaultView == null) return;
-
-            var newIndex = SelectedLogEntryIndex;
-            foreach (var entry in _defaultView.OfType<LogEntry>().Skip(SelectedLogEntryIndex + 1))
-            {
-                newIndex++;
-                if (MatchesSearch(entry, searchText))
-                {
-                    SelectedLogEntryIndex = newIndex;
-                    break;
-                }
-            }
-        }
-
-        public IEnumerable<LogEntry> LogEntries
-        {
-            get => _logEntries;
-            private set
-            {
-                if (Equals(value, _logEntries)) return;
-                _logEntries = value;
 
 
-                _defaultView = CollectionViewSource.GetDefaultView(_logEntries);
-                if (_defaultView != null) {
-                    _defaultView.Filter = FilterLogEntries;
-                }
-
-                OnPropertyChanged();
-            }
-        }
-
-        private bool FilterLogEntries(object x)
-        {
-            if (!(x is LogEntry entry)) return false;
-
-            if (WhitelistedProcessThreadFilters.Any() && !WhitelistedProcessThreadFilters.Any(f => f.Matches(entry))) return false;
-            if (BlacklistedProcessThreadFilters.Any(f => f.Matches(entry))) return false;
-            if (WhitelistedTags.Any() && !WhitelistedTags.Any(t => entry.Tag.Equals(t))) return false;
-            if (BlacklistedTags.Any(t => entry.Tag.Equals(t))) return false;
-            if (!ShowDebug && entry.Level.Equals("D")) return false;
-            if (!ShowError && entry.Level.Equals("E")) return false;
-            if (!ShowInfo && entry.Level.Equals("I")) return false;
-            if (!ShowVerbose && entry.Level.Equals("V")) return false;
-            if (!ShowWarn && entry.Level.Equals("W")) return false;
-
-            return true;
-        }
-
-        public ICommand OpenFileCommand { get; }
-
-        public ICommand ExportCommand { get; }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
-
-        #region Process/Thread filtering
-        private ObservableCollection<ProcessThreadFilter> _availableProcessThreadFilters;
-
-        public ObservableCollection<ProcessThreadFilter> AvailableProcessThreadFilters
-        {
-            get => _availableProcessThreadFilters;
-            set
-            {
-                if (Equals(value, _availableProcessThreadFilters)) return;
-                _availableProcessThreadFilters = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ObservableCollection<ProcessThreadFilter> WhitelistedProcessThreadFilters { get; } = new ObservableCollection<ProcessThreadFilter>();
-        public ObservableCollection<ProcessThreadFilter> BlacklistedProcessThreadFilters { get; } = new ObservableCollection<ProcessThreadFilter>();
-
-        public ICommand AddWhitelistedProcessThreadFilterCommand { get; }
-
-        public ICommand RemoveWhitelistedProcessThreadFilterCommand { get; }
-
-        public ICommand AddBlacklistedProcessThreadFilterCommand { get; }
-
-        public ICommand RemoveBlacklistedProcessThreadFilterCommand { get; }
-
-        public ICommand ShowOnlyThreadOfSelectedItemCommand { get; private set; }
-
-        public ICommand ShowOnlyProcessOfSelectedItemCommand { get; private set; }
-
-        public ICommand HideThreadOfSelectedItemCommand { get; private set; }
-
-        public ICommand HideProcessOfSelectedItemCommand { get; private set; }
         #endregion
 
         #region Tag filtering
@@ -380,6 +304,38 @@ namespace AndroidLogViewer
 
         public ICommand HideTagOfSelectedItemCommand { get; private set; }
 
+        private void HideTagOfSelectedItem()
+        {
+            var entry = SelectedLogEntry;
+            BlacklistedTags.Add(entry.Tag);
+        }
+
+        private void AddBlacklistedTag(string tag)
+        {
+            BlacklistedTags.Add(tag);
+        }
+
+        private void RemoveBlacklistedTag(string tag)
+        {
+            BlacklistedTags.Remove(tag);
+        }
+
+        private void ShowOnlyTagForSelectedItem()
+        {
+            var entry = SelectedLogEntry;
+            WhitelistedTags.Clear();
+            WhitelistedTags.Add(entry.Tag);
+        }
+
+        private void AddWhitelistedTag(string tag)
+        {
+            WhitelistedTags.Add(tag);
+        }
+
+        private void RemoveWhitelistedTag(string tag)
+        {
+            WhitelistedTags.Remove(tag);
+        }
         #endregion
 
         #region Loglevel filtering
@@ -391,7 +347,7 @@ namespace AndroidLogViewer
         private bool _showError = true;
         private int _selectedLogEntryIndex;
         private string _fileName;
-        private bool _isWorking = false;
+        private object _activeDialog;
 
         public bool ShowVerbose
         {
@@ -456,6 +412,10 @@ namespace AndroidLogViewer
         #endregion
 
         #region Loading
+        public ICommand OpenUrlCommand { get; }
+
+        public ICommand OpenFileCommand { get; }
+
         private async void OpenFile()
         {
             var dlg = new OpenFileDialog
@@ -471,57 +431,59 @@ namespace AndroidLogViewer
             
 
             using (var reader = File.OpenText(dlg.FileName))
+            using (var progressDialog = new ProgressDialogViewModel())
             {
-                IsWorking = true;
-                try
-                {
-                    FileName = dlg.FileName;
-                    await ProcessLogData(reader);
-                }
-                finally
-                {
-                    IsWorking = false;
-                }
+                ShowDialog<ProgressDialogViewModel, object>(progressDialog).FireAndForget();
+                FileName = dlg.FileName;
+                await ProcessLogData(reader);
+                await Task.Delay(1000);
             }
         }
 
         private async void OpenUrl()
         {
-            var address = Interaction.InputBox("Please enter the URL to load", "Open URL", string.Empty);
-            if (string.IsNullOrEmpty(address)) return;
-
-            using (var webClient = new WebClient())
+            var dialog = ShowDialog<StringInputDialogViewModel,string>(new StringInputDialogViewModel("Open URL")
             {
-                Stream stream;
-                try
-                {
-                    stream = webClient.OpenRead(address);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                    return;
-                }
+                Prompt = "Please enter the URL to load"
+            });
 
-                if (stream == null) return;
+            try
+            {
+                var address = await dialog;
 
-                using (var reader = new StreamReader(stream))
+                if (string.IsNullOrEmpty(address)) return;
+
+                using (var webClient = new WebClient())
                 {
-                    IsWorking = true;
+                    Stream stream;
                     try
                     {
+                        stream = webClient.OpenRead(address);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                        return;
+                    }
+
+                    if (stream == null) return;
+
+                    using (var reader = new StreamReader(stream))
+                    using (var progressDialog = new ProgressDialogViewModel())
+                    {
+                        ShowDialog<ProgressDialogViewModel, object>(progressDialog).FireAndForget();
                         FileName = address;
                         await ProcessLogData(reader);
                     }
-                    finally
-                    {
-                        IsWorking = false;
-                    }
                 }
+            }
+            catch (TaskCanceledException)
+            {
+                // NOP
             }
         }
 
-        private async Task ProcessLogData(StreamReader reader)
+        private async Task ProcessLogData(TextReader reader)
         {
             LogEntries = null;
             AvailableProcessThreadFilters = null;
@@ -536,7 +498,6 @@ namespace AndroidLogViewer
                 await Task<string[]>.Factory.StartNew(() =>
                     LogEntries.Select(x => x.Tag).Distinct().OrderBy(x => x).ToArray()));
         }
-
 
         private ObservableCollection<ProcessThreadFilter> GenerateProcessThreadFilters()
         {
@@ -571,7 +532,7 @@ namespace AndroidLogViewer
             return result;
         }
 
-        private static ObservableCollection<LogEntry> ReadLogEntries(StreamReader reader)
+        private static ObservableCollection<LogEntry> ReadLogEntries(TextReader reader)
         {
             var result = new ObservableCollection<LogEntry>();
 
@@ -626,7 +587,39 @@ namespace AndroidLogViewer
 
         public bool SearchCaseSensitive { get; set; } = false;
 
-        public ICommand OpenUrlCommand { get; }
+        private void SearchBackward(string searchText)
+        {
+            if (_defaultView == null) return;
+
+            var items = _defaultView.OfType<LogEntry>().ToArray();
+
+            var newIndex = SelectedLogEntryIndex;
+            while (newIndex > 0)
+            {
+                newIndex--;
+                if (MatchesSearch(items[newIndex], searchText))
+                {
+                    SelectedLogEntryIndex = newIndex;
+                    break;
+                }
+            }
+        }
+
+        private void SearchForward(string searchText)
+        {
+            if (_defaultView == null) return;
+
+            var newIndex = SelectedLogEntryIndex;
+            foreach (var entry in _defaultView.OfType<LogEntry>().Skip(SelectedLogEntryIndex + 1))
+            {
+                newIndex++;
+                if (MatchesSearch(entry, searchText))
+                {
+                    SelectedLogEntryIndex = newIndex;
+                    break;
+                }
+            }
+        }
 
         private bool MatchesSearch(LogEntry entry, string searchText)
         {
@@ -644,6 +637,44 @@ namespace AndroidLogViewer
 
         #endregion
 
+        #region Dialogs
+
+        public object ActiveDialog
+        {
+            get => _activeDialog;
+            private set
+            {
+                if (Equals(value, _activeDialog)) return;
+                _activeDialog = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private readonly object activeDialogLock = new object();
+
+        public async Task<TResult> ShowDialog<TViewModel, TResult>(TViewModel viewModel) where TViewModel : IDialogViewModel<TResult>
+        {
+            object oldActiveDialog;
+            lock (activeDialogLock)
+            {
+                oldActiveDialog = ActiveDialog;
+                ActiveDialog = viewModel;
+            }
+
+            try
+            {
+                return await viewModel.Result;
+            }
+            finally
+            {
+                lock (activeDialogLock)
+                {
+                    ActiveDialog = oldActiveDialog;
+                }
+            }
+        }
+
+        #endregion
 
     }
 }

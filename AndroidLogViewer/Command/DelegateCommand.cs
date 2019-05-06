@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Windows.Input;
 
-namespace Prism.Commands
+namespace AndroidLogViewer.Command
 {
     /// <summary>
     /// An <see cref="ICommand"/> whose delegates do not take any parameters for <see cref="Execute()"/> and <see cref="CanExecute()"/>.
