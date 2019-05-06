@@ -13,6 +13,8 @@ cache:
 artifacts:
   - path: '**/*.msi' 
     name: Installers
+  - path: 'Android Log Viewer Portable.zip'
+    name: PortableApplication
 
 assembly_info:
   patch: true
@@ -36,6 +38,9 @@ build:
 
 before_build:
   - cmd: nuget restore
+
+after_build:
+  - cmd: 7z a "Android Log Viewer Portable.zip" %APPVEYOR_BUILD_FOLDER%\AndroidLogViewer\bin\Release\*.exe
 
 deploy:
   - provider: GitHub
