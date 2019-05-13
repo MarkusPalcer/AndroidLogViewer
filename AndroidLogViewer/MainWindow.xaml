@@ -24,6 +24,11 @@
         <local:MainWindowViewModel />
     </Window.DataContext>
 
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding ImportClipboardCommand}"
+                    Gesture="CTRL+SHIFT+V"></KeyBinding>
+    </Window.InputBindings>
+
     <Grid>
 
         <Grid>
@@ -43,6 +48,7 @@
                 <MenuItem Header="_File">
                     <MenuItem Header="_Open" Command="{Binding OpenFileCommand}" />
                     <MenuItem Header="Open _URL" Command="{Binding OpenUrlCommand}" />
+                    <MenuItem Header="Open from Clipboard" Command="{Binding ImportClipboardCommand}" InputGestureText="CTRL+SHIFT+V" />
                     <Separator />
                     <MenuItem Header="_Export filtered log" Command="{Binding ExportCommand}" />
                     <Separator />

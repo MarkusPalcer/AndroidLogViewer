@@ -53,6 +53,7 @@ namespace AndroidLogViewer
 
             OpenFileCommand = new DelegateCommand(OpenFile);
             OpenUrlCommand = new DelegateCommand(OpenUrl);
+            ImportClipboardCommand = new DelegateCommand(ImportFromClipboard);
 
             WhitelistedProcessThreadFilters.CollectionChanged += RefreshView;
             BlacklistedProcessThreadFilters.CollectionChanged += RefreshView;
@@ -270,8 +271,6 @@ namespace AndroidLogViewer
             WhitelistedProcessThreadFilters.Remove(f);
         }
 
-
-
         #endregion
 
         #region Tag filtering
@@ -416,6 +415,8 @@ namespace AndroidLogViewer
 
         public ICommand OpenFileCommand { get; }
 
+        public ICommand ImportClipboardCommand { get; }
+
         private async void OpenFile()
         {
             var dlg = new OpenFileDialog
@@ -480,6 +481,19 @@ namespace AndroidLogViewer
             catch (TaskCanceledException)
             {
                 // NOP
+            }
+        }
+
+        private async void ImportFromClipboard()
+        {
+            if (!Clipboard.ContainsText(TextDataFormat.Text)) return;
+            var data = Clipboard.GetText(TextDataFormat.Text);
+            using (var reader = new StringReader(data))
+            using (var progressDialog = new ProgressDialogViewModel())
+            {
+                ShowDialog<ProgressDialogViewModel, object>(progressDialog).FireAndForget();
+                FileName = "[From Clipboard]";
+                await ProcessLogData(reader);
             }
         }
 
