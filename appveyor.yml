@@ -47,6 +47,7 @@ deploy:
     release: Android Log Viewer $(appveyor_build_version)
     description: 'Android Log Viewer release for version $(appveyor_build_version)'
     draft: true
+    tag: $(APPVEYOR_REPO_TAG_NAME)
     auth_token: 
       secure: fw8xGdlviNruXruf81HaAXKFPLfMkslVjV5gfJMxGmY3CHlpZWtFp+4w2TF0f+wT
     on: 
@@ -55,7 +56,18 @@ deploy:
 init:
   # Set "build version number" from the tag name when applicable
   - ps: >-
-      if ($env:APPVEYOR_REPO_TAG -eq "true" -and $env:APPVEYOR_REPO_TAG.StartsWith("v"))
+      if ($env:APPVEYOR_REPO_TAG -eq "true")
           {
-            Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_TAG_NAME.TrimStart("v"))"
-          }
+            if ($env:APPVEYOR_REPO_TAG_NAME.StartsWith("v"))
+            {
+              Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_TAG_NAME.TrimStart("v"))"
+            }
+            else
+            {
+              echo "Tag '$env:APPVEYOR_REPO_TAG_NAME' does not start with 'v'!"
+            }
+          } 
+          else 
+          {
+            echo "Not a tag!"
+          } 
