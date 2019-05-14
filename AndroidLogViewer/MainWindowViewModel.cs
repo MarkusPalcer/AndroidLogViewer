@@ -29,7 +29,6 @@ namespace AndroidLogViewer
         public MainWindowViewModel()
         {
             SearchForwardCommand = new DelegateCommand<string>(SearchForward);
-
             SearchBackwardCommand = new DelegateCommand<string>(SearchBackward);
 
             RemoveWhitelistedTagCommand = new DelegateCommand<string>(RemoveWhitelistedTag);
@@ -59,6 +58,9 @@ namespace AndroidLogViewer
             BlacklistedProcessThreadFilters.CollectionChanged += RefreshView;
             WhitelistedTags.CollectionChanged += RefreshView;
             BlacklistedTags.CollectionChanged += RefreshView;
+
+            RemoveLeadingLinesCommand = new DelegateCommand(RemoveLinesBeforeSelected);
+            RemoveTrailingLinesCommand = new DelegateCommand(() => LogEntries = RemoveLinesAfterSelected().ToArray());
         }
 
         public string FileName
@@ -664,12 +666,12 @@ namespace AndroidLogViewer
             }
         }
 
-        private readonly object activeDialogLock = new object();
+        private readonly object _activeDialogLock = new object();
 
         public async Task<TResult> ShowDialog<TViewModel, TResult>(TViewModel viewModel) where TViewModel : IDialogViewModel<TResult>
         {
             object oldActiveDialog;
-            lock (activeDialogLock)
+            lock (_activeDialogLock)
             {
                 oldActiveDialog = ActiveDialog;
                 ActiveDialog = viewModel;
@@ -681,7 +683,7 @@ namespace AndroidLogViewer
             }
             finally
             {
-                lock (activeDialogLock)
+                lock (_activeDialogLock)
                 {
                     ActiveDialog = oldActiveDialog;
                 }
@@ -690,5 +692,25 @@ namespace AndroidLogViewer
 
         #endregion
 
+        #region Line removal
+        public ICommand RemoveLeadingLinesCommand { get; }
+
+        public ICommand RemoveTrailingLinesCommand { get; }
+
+        private void RemoveLinesBeforeSelected()
+        {
+            LogEntries = LogEntries.SkipWhile(x => x != SelectedLogEntry).ToArray();
+        }
+
+        private IEnumerable<LogEntry> RemoveLinesAfterSelected()
+        {
+            foreach (var logEntry in LogEntries)
+            {
+                yield return logEntry;
+                if (logEntry == SelectedLogEntry) yield break;
+            }
+        }
+
+        #endregion
     }
 }

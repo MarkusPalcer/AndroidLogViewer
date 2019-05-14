@@ -278,6 +278,14 @@
                                 </TextBlock>
                             </MenuItem.Header>
                         </MenuItem>
+
+                        <MenuItem
+                            Command="{Binding Path=DataContext.RemoveLeadingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Header="Delete all lines before this" />
+
+                        <MenuItem
+                            Command="{Binding Path=DataContext.RemoveTrailingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Header="Delete all lines after this" />
                     </ContextMenu>
                 </ListView.Resources>
                 <ListView.View>
