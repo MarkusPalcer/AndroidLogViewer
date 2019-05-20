@@ -7,7 +7,9 @@ namespace AndroidLogViewer
 {
     public class LogEntry : INotifyPropertyChanged
     {
-        public String Time { get; set; }
+        public int PivotSize { get;set; }
+
+        public string Time { get; set; }
 
         public int Process { get; set; }
 
@@ -21,7 +23,7 @@ namespace AndroidLogViewer
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

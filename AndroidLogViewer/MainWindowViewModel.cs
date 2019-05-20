@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -169,7 +168,7 @@ namespace AndroidLogViewer
             var dateTimeLength = entries.Max(x => x.Time.Length);
             var pidLength = entries.Max(x => x.Process.ToString().Length);
             var tidLength = entries.Max(x => x.Thread.ToString().Length);
-            var tagLength = entries.Max(x => x.Tag.Length);
+            var tagLength = entries.Max(x => x.Tag.Length) + 1;
 
             var lines = entries.Select(x =>
                 string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}",
@@ -178,7 +177,7 @@ namespace AndroidLogViewer
                     x.Process.ToString().PadRight(pidLength),
                     x.Thread.ToString().PadRight(tidLength),
                     x.Level,
-                    x.Tag.PadRight(tagLength),
+                    $"{x.Tag}:".PadRight(tagLength),
                     x.Message));
             File.WriteAllLines(dlg.FileName, lines);
         }
@@ -507,7 +506,7 @@ namespace AndroidLogViewer
             BlacklistedProcessThreadFilters.Clear();
             WhitelistedProcessThreadFilters.Clear();
 
-            LogEntries = await Task<ObservableCollection<LogEntry>>.Factory.StartNew(() => ReadLogEntries(reader));
+            LogEntries = await Task<ObservableCollection<LogEntry>>.Factory.StartNew(() => LogcatParser.ReadLogEntries(reader));
             AvailableProcessThreadFilters =
                 await Task<ObservableCollection<ProcessThreadFilter>>.Factory.StartNew(GenerateProcessThreadFilters);
             AvailableTags = new ObservableCollection<string>(
@@ -548,38 +547,6 @@ namespace AndroidLogViewer
             return result;
         }
 
-        private static ObservableCollection<LogEntry> ReadLogEntries(TextReader reader)
-        {
-            var result = new ObservableCollection<LogEntry>();
-
-            var line = reader.ReadLine();
-            var regex = new Regex(
-                "^(?<datetime>\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d.\\d\\d\\d)\\s+(?<pid>\\d+)\\s+(?<tid>\\d+)\\s+(?<level>\\w)\\s+(?<tag>[^:]+):\\s(?<message>.*)$",
-                RegexOptions.Compiled);
-
-            while (line != null)
-            {
-                var matches = regex.Matches(line);
-
-                foreach (Match match in matches)
-                {
-                    result.Add(new LogEntry
-                    {
-                        Message = match.Groups["message"].Value,
-                        Level = match.Groups["level"].Value,
-                        Process = int.Parse(match.Groups["pid"].Value),
-                        Thread = int.Parse(match.Groups["tid"].Value),
-                        Tag = match.Groups["tag"].Value,
-                        Time = match.Groups["datetime"].Value,
-                    });
-                }
-
-                line = reader.ReadLine();
-            }
-
-            return result;
-        }
-
         #endregion
 
         #region Search
@@ -601,7 +568,7 @@ namespace AndroidLogViewer
 
         public LogEntry SelectedLogEntry { get; set; }
 
-        public bool SearchCaseSensitive { get; set; } = false;
+        public bool SearchCaseSensitive { get; set; }
 
         private void SearchBackward(string searchText)
         {

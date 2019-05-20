@@ -61,6 +61,7 @@
     <Compile Include="Command\PropertyObserver.cs" />
     <Compile Include="Command\PropertyObserverNode.cs" />
     <Compile Include="Dialogs\DialogViewModelBase.cs" />
+    <Compile Include="LogcatParser.cs" />
     <Compile Include="Properties\Annotations1.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Page Include="Dialogs\Dialogs.xaml">
