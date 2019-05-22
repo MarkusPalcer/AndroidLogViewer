@@ -7,8 +7,6 @@ namespace AndroidLogViewer
 {
     public class LogEntry : INotifyPropertyChanged
     {
-        public int PivotSize { get;set; }
-
         public string Time { get; set; }
 
         public int Process { get; set; }

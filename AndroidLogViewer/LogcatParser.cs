@@ -30,6 +30,7 @@ namespace AndroidLogViewer
         {
             var result = new ObservableCollection<LogEntry>();
             LogEntry pivotEntry = null;
+            var pivotSize = 0;
 
             var line = reader.ReadLine();
 
@@ -51,7 +52,7 @@ namespace AndroidLogViewer
                             Tag = match.Groups["tag"].Value.Trim(),
                             Time = match.Groups["datetime"].Value.Trim(),
                         };
-                        if (match.Groups["premessage"].Success) newEntry.PivotSize = match.Groups["premessage"].Length;
+                        if (match.Groups["premessage"].Success) pivotSize = match.Groups["premessage"].Length;
 
                         pivotEntry = newEntry;
                     }
@@ -59,7 +60,7 @@ namespace AndroidLogViewer
                     {
                         var trimmedMessage = match.Groups["message"].Value.Trim();
                         var originalSpaceCount = match.Groups["message"].Length - trimmedMessage.Length + 1;
-                        var messageSpaceCount = originalSpaceCount - pivotEntry.PivotSize;
+                        var messageSpaceCount = originalSpaceCount - pivotSize;
 
                         newEntry = new LogEntry
                         {
