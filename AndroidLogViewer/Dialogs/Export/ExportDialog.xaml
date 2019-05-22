@@ -1,0 +1,17 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:dialogs="clr-namespace:AndroidLogViewer.Dialogs">
+    <DataTemplate DataType="{x:Type dialogs:ExportDialogViewModel}">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Width="270">
+            <DockPanel HorizontalAlignment="Stretch">
+                <Button Content="..." Command="{Binding BrowseFileCommand}" DockPanel.Dock="Right"/>
+                <TextBox Text="{Binding FileName}" HorizontalAlignment="Stretch" TextWrapping="Wrap"/>
+            </DockPanel>
+            <CheckBox IsChecked="{Binding AlignColumns}" ToolTip="Pads entries with spaces, so a column has the same width across all lines">Pad with spaces</CheckBox>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Command="{Binding CancelCommand}" Margin="10,0" Height="25" Width="50">Cancel</Button>
+                <Button Command="{Binding ConfirmCommand}" Margin="10,0,0,0" Height="25" Width="50">Ok</Button>
+            </StackPanel>
+        </StackPanel>
+    </DataTemplate>
+</ResourceDictionary>

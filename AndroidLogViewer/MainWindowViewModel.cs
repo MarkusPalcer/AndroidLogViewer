@@ -20,7 +20,6 @@ namespace AndroidLogViewer
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private const int ExportFieldPadding = 2;
         private IEnumerable<LogEntry> _logEntries;
         
         private ICollectionView _defaultView;
@@ -47,7 +46,9 @@ namespace AndroidLogViewer
             HideProcessOfSelectedItemCommand = new DelegateCommand(HideProcessOfSelectedItem);
             HideThreadOfSelectedItemCommand = new DelegateCommand(HideThreadOfSelectedItem);
 
-            ExportCommand = new DelegateCommand(ExportFile, () => !string.IsNullOrEmpty(FileName)).ObservesProperty(() => FileName);
+            ExportCommand = new DelegateCommand(
+                () => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(_defaultView.OfType<LogEntry>().ToArray())).FireAndForget(), 
+                () => !string.IsNullOrEmpty(FileName)).ObservesProperty(() => FileName);
 
             OpenFileCommand = new DelegateCommand(OpenFile);
             OpenUrlCommand = new DelegateCommand(OpenUrl);
@@ -146,42 +147,7 @@ namespace AndroidLogViewer
             return true;
         }
 
-        #region Export
         public ICommand ExportCommand { get; }
-        
-        private void ExportFile()
-        {
-            var dlg = new SaveFileDialog
-            {
-                CheckPathExists = true,
-                Title = "Select logcat file",
-                RestoreDirectory = true,
-                OverwritePrompt = true,
-            };
-
-            var dialogResult = dlg.ShowDialog();
-            if (!dialogResult.HasValue || !dialogResult.Value) return;
-
-
-            var entries = _defaultView.OfType<LogEntry>().ToArray();
-            
-            var dateTimeLength = entries.Max(x => x.Time.Length);
-            var pidLength = entries.Max(x => x.Process.ToString().Length);
-            var tidLength = entries.Max(x => x.Thread.ToString().Length);
-            var tagLength = entries.Max(x => x.Tag.Length) + 1;
-
-            var lines = entries.Select(x =>
-                string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}",
-                    new string(' ', ExportFieldPadding),
-                    x.Time.PadRight(dateTimeLength),
-                    x.Process.ToString().PadRight(pidLength),
-                    x.Thread.ToString().PadRight(tidLength),
-                    x.Level,
-                    $"{x.Tag}:".PadRight(tagLength),
-                    x.Message));
-            File.WriteAllLines(dlg.FileName, lines);
-        }
-        #endregion
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;

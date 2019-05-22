@@ -3,8 +3,9 @@
                     xmlns:androidLogViewer="clr-namespace:AndroidLogViewer"
                     xmlns:dialogs="clr-namespace:AndroidLogViewer.Dialogs">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="StringInputDialog.xaml" />
-        <ResourceDictionary Source="ProgressDialog.xaml" />
+        <ResourceDictionary Source="Input/String/StringInputDialog.xaml" />
+        <ResourceDictionary Source="Progress/ProgressDialog.xaml" />
+        <ResourceDictionary Source="Export/ExportDialog.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <DataTemplate x:Key="DialogTemplate" DataType="dialogs:IDialogViewModel">

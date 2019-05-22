@@ -20,7 +20,6 @@ namespace AndroidLogViewer.Dialogs
         /// If this is set to <c>null</c>, the button will not be displayed.
         /// </summary>
         ICommand CancelCommand { get; }
-
     }
 
     /// <summary>
@@ -30,6 +29,5 @@ namespace AndroidLogViewer.Dialogs
     public interface IDialogViewModel<TResult> : IDialogViewModel
     {
         Task<TResult> Result { get; }
-
     }
 }

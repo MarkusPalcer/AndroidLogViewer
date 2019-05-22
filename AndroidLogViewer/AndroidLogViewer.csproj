@@ -60,7 +60,8 @@
     </ApplicationDefinition>
     <Compile Include="Command\PropertyObserver.cs" />
     <Compile Include="Command\PropertyObserverNode.cs" />
-    <Compile Include="Dialogs\DialogViewModelBase.cs" />
+    <Compile Include="Dialogs\Base\DialogViewModelBase.cs" />
+    <Compile Include="Dialogs\Export\ExportDialogViewModel.cs" />
     <Compile Include="LogcatParser.cs" />
     <Compile Include="Properties\Annotations1.cs" />
     <Compile Include="TaskExtensions.cs" />
@@ -68,11 +69,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\StringInputDialog.xaml">
+    <Page Include="Dialogs\Export\ExportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\Input\String\StringInputDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\ProgressDialog.xaml">
+    <Page Include="Dialogs\Progress\ProgressDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -87,9 +92,9 @@
     <Compile Include="Command\DelegateCommand.cs" />
     <Compile Include="Command\DelegateCommandBase.cs" />
     <Compile Include="Command\DelegateCommandT.cs" />
-    <Compile Include="Dialogs\ProgressDialogViewModel.cs" />
-    <Compile Include="Dialogs\StringInputDialogViewModel.cs" />
-    <Compile Include="Dialogs\IDialogViewModel.cs" />
+    <Compile Include="Dialogs\Progress\ProgressDialogViewModel.cs" />
+    <Compile Include="Dialogs\Input\String\StringInputDialogViewModel.cs" />
+    <Compile Include="Dialogs\Base\IDialogViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
