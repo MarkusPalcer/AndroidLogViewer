@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -49,6 +50,7 @@ namespace AndroidLogViewer
             ExportCommand = new DelegateCommand(
                 () => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(_defaultView.OfType<LogEntry>().ToArray())).FireAndForget(), 
                 () => !string.IsNullOrEmpty(FileName)).ObservesProperty(() => FileName);
+            ExportSelectionCommand = new DelegateCommand<IEnumerable<object>>(x => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(x.OfType<LogEntry>().ToArray())).FireAndForget());
 
             OpenFileCommand = new DelegateCommand(OpenFile);
             OpenUrlCommand = new DelegateCommand(OpenUrl);
@@ -148,6 +150,8 @@ namespace AndroidLogViewer
         }
 
         public ICommand ExportCommand { get; }
+
+        public ICommand ExportSelectionCommand { get; }
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;

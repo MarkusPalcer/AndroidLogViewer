@@ -286,6 +286,10 @@
                         <MenuItem
                             Command="{Binding Path=DataContext.RemoveTrailingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
                             Header="Delete all lines after this" />
+
+                        <MenuItem Header="Export selected items"
+                            CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Command="{Binding Path=DataContext.ExportSelectionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}" />
                     </ContextMenu>
                 </ListView.Resources>
                 <ListView.View>
