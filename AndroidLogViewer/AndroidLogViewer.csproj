@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Command\BindingRedirector.cs" />
     <Compile Include="Command\PropertyObserver.cs" />
     <Compile Include="Command\PropertyObserverNode.cs" />
     <Compile Include="Dialogs\Base\DialogViewModelBase.cs" />

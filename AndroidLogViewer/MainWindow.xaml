@@ -212,6 +212,9 @@
                       Style="{StaticResource MonospaceFont}"
                       SelectedIndex="{Binding SelectedLogEntryIndex}"
                       SelectedItem="{Binding Path=SelectedLogEntry, Mode=OneWayToSource}">
+                <ListView.CommandBindings>
+                    <CommandBinding Command="Copy" Executed="ExecuteCopyLogItems"/>
+                </ListView.CommandBindings>
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
                         <MenuItem
@@ -286,6 +289,10 @@
                         <MenuItem
                             Command="{Binding Path=DataContext.RemoveTrailingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
                             Header="Delete all lines after this" />
+
+                        <MenuItem Header="Export selected items"
+                            CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Command="{Binding Path=DataContext.ExportSelectionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}" />
                     </ContextMenu>
                 </ListView.Resources>
                 <ListView.View>

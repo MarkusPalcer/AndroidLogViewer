@@ -14,12 +14,13 @@ namespace AndroidLogViewer
         private const string TagRegularExpression = "(?<tag>[^:]+):";
         private const string MessageRegularExpression = "(?<message>.*)";
         private static readonly string TrailingLineRegularExpression =$"(?<trailingline>\\s+?){MessageRegularExpression}";
-        private static readonly string DefaultLogcatRegularExpression = $"(?<premessage>{DateTimeRegularExpression}\\s+{PidRegularExpression}\\s+{TidRegularExpression}\\s+{LogLevelRegularExpression}\\s+{TagRegularExpression}\\s+?){MessageRegularExpression}";
-        private static readonly string AndroidStudioRegularExpression = $"(?<premessage>{DateTimeRegularExpression}\\s+{PidRegularExpression}-{TidRegularExpression}[^\\s]+\\s+{LogLevelRegularExpression}/{TagRegularExpression}\\s+?){MessageRegularExpression}";
+        private static readonly string DefaultLogcatRegularExpression = $"(?<premessage>{DateTimeRegularExpression}\\s+{PidRegularExpression}\\s+{TidRegularExpression}\\s+{LogLevelRegularExpression}\\s*{TagRegularExpression}\\s+?){MessageRegularExpression}";
+        private static readonly string AndroidStudioRegularExpression = $"(?<premessage>{DateTimeRegularExpression}\\s+{PidRegularExpression}-{TidRegularExpression}[^\\s]+\\s*{LogLevelRegularExpression}/{TagRegularExpression}\\s+?){MessageRegularExpression}";
+        private static readonly string StartOfLogExpression = "(?<startoflog>\\s*---+)(?<message>.*)";
         
         
-        private static readonly string[] RecognizedRegularExpressions = {DefaultLogcatRegularExpression, AndroidStudioRegularExpression, TrailingLineRegularExpression};
-        private static readonly string Pattern = $"^{string.Join("|", RecognizedRegularExpressions.Select(x => $"({x})"))}$";
+        private static readonly string[] RecognizedRegularExpressions = {DefaultLogcatRegularExpression, AndroidStudioRegularExpression, TrailingLineRegularExpression, StartOfLogExpression};
+        private static readonly string Pattern = $"{string.Join("|", RecognizedRegularExpressions.Select(x => $"^({x})$"))}";
         private static readonly Regex RegularExpression = new Regex(Pattern, RegexOptions.Compiled);
 
         static LogcatParser()
@@ -41,6 +42,7 @@ namespace AndroidLogViewer
                 if (match.Success)
                 {
                     LogEntry newEntry = null;
+                    
                     if (match.Groups["datetime"].Success)
                     {
                         newEntry = new LogEntry
@@ -55,6 +57,13 @@ namespace AndroidLogViewer
                         if (match.Groups["premessage"].Success) pivotSize = match.Groups["premessage"].Length;
 
                         pivotEntry = newEntry;
+                    }
+                    else if (match.Groups["startoflog"].Success)
+                    {
+                        newEntry = new LogEntry
+                        {
+                            Message = $"--- {match.Groups["message"].Value.Trim()}"
+                        };
                     }
                     else if (match.Groups["trailingline"].Success && pivotEntry != null)
                     {
@@ -72,6 +81,7 @@ namespace AndroidLogViewer
                             Time = pivotEntry.Time,
                         };
                     }
+
                     if (newEntry != null) result.Add(newEntry);
                 }
 

@@ -97,13 +97,18 @@ namespace AndroidLogViewer.Dialogs
             }
             else
             {
-                lines = _entries.Select(x=> $"{x.Time} {x.Process} {x.Thread} {x.Level} {x.Tag}: {x.Message}");
+                lines = _entries.Select(FormatLogEntry);
             }
             
 
             File.WriteAllLines(FileName, lines);
 
             Done(null);
+        }
+
+        public static string FormatLogEntry(LogEntry x)
+        {
+            return $"{x.Time} {x.Process} {x.Thread} {x.Level} {x.Tag}: {x.Message}";
         }
     }
 }
