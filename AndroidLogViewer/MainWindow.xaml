@@ -212,6 +212,9 @@
                       Style="{StaticResource MonospaceFont}"
                       SelectedIndex="{Binding SelectedLogEntryIndex}"
                       SelectedItem="{Binding Path=SelectedLogEntry, Mode=OneWayToSource}">
+                <ListView.CommandBindings>
+                    <CommandBinding Command="Copy" Executed="ExecuteCopyLogItems"/>
+                </ListView.CommandBindings>
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
                         <MenuItem
