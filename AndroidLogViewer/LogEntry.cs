@@ -7,16 +7,17 @@ namespace AndroidLogViewer
 {
     public class LogEntry : INotifyPropertyChanged
     {
-        public string Time { get; set; }
+        public string Time { get; set; } = string.Empty;
 
         public int Process { get; set; }
 
         public int Thread { get; set; }
 
-        public string Level { get; set; }
+        public string Level { get; set; }  = string.Empty;
 
-        public string Message { get; set; }
-        public string Tag { get; set; }
+        public string Message { get; set; }  = string.Empty;
+
+        public string Tag { get; set; }  = string.Empty;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
