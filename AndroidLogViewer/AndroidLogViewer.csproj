@@ -71,6 +71,7 @@
     <Compile Include="Models\ILogEntryVisitor.cs" />
     <Compile Include="Models\StartOfBufferEntry.cs" />
     <Compile Include="Properties\Annotations1.cs" />
+    <Compile Include="Style\Grouping.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Page Include="Dialogs\Dialogs.xaml">
       <SubType>Designer</SubType>
@@ -106,6 +107,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Style\Colors.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Style\Style.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindowViewModel.cs" />
