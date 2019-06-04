@@ -14,6 +14,9 @@
             <Style TargetType="Control" x:Key="MonospaceFont">
                 <Setter Property="FontFamily" Value="Lucida Console"></Setter>
             </Style>
+            <Style TargetType="CheckBox" x:Key="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
+                <Setter Property="Margin" Value="0,5,0,0" />
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -43,13 +46,19 @@
                   Grid.Column="0"
                   Grid.ColumnSpan="2">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_Open" Command="{Binding OpenFileCommand}" />
-                    <MenuItem Header="Open _URL" Command="{Binding OpenUrlCommand}" />
-                    <MenuItem Header="Open from Clipboard" Command="{Binding ImportClipboardCommand}" InputGestureText="CTRL+SHIFT+V" />
+                    <MenuItem Header="_Open" 
+                              Command="{Binding OpenFileCommand}" />
+                    <MenuItem Header="Open _URL" 
+                              Command="{Binding OpenUrlCommand}" />
+                    <MenuItem Header="Open from Clipboard" 
+                              Command="{Binding ImportClipboardCommand}" 
+                              InputGestureText="CTRL+SHIFT+V" />
                     <Separator />
-                    <MenuItem Header="_Export filtered log" Command="{Binding ExportCommand}" />
+                    <MenuItem Header="_Export filtered log" 
+                              Command="{Binding ExportCommand}" />
                     <Separator />
-                    <MenuItem Header="E_xit" Click="CloseWindow" />
+                    <MenuItem Header="E_xit" 
+                              Click="CloseWindow" />
                 </MenuItem>
             </Menu>
 
@@ -190,12 +199,12 @@
                     </GroupBox>
 
                     <GroupBox Header="Log Level">
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox IsChecked="{Binding ShowVerbose}">V</CheckBox>
-                            <CheckBox IsChecked="{Binding ShowDebug}">D</CheckBox>
-                            <CheckBox IsChecked="{Binding ShowInfo}">I</CheckBox>
-                            <CheckBox IsChecked="{Binding ShowWarn}">W</CheckBox>
-                            <CheckBox IsChecked="{Binding ShowError}">E</CheckBox>
+                        <StackPanel Orientation="Vertical">
+                            <CheckBox IsChecked="{Binding ShowVerbose}">Verbose</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowDebug}">Debug</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowInfo}">Info</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowWarn}">Warning</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowError}">Error</CheckBox>
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>
