@@ -5,15 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AndroidLogViewer"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:styles="clr-namespace:AndroidLogViewer.Style"
         mc:Ignorable="d"
         Title="Android Log Viewer" Height="450" Width="800"
         x:Name="Root">
     <Window.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Dialogs/Dialogs.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <Style TargetType="Control" x:Key="MonospaceFont">
                 <Setter Property="FontFamily" Value="Lucida Console"></Setter>
             </Style>
@@ -38,7 +35,7 @@
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="4*" />
             </Grid.ColumnDefinitions>
 
@@ -64,18 +61,20 @@
                 <StackPanel Orientation="Vertical">
                     <GroupBox Header="Search">
                         <StackPanel Orientation="Vertical">
-                            <TextBox HorizontalAlignment="Stretch" x:Name="SearchText"></TextBox>
+                            <DockPanel VerticalAlignment="Stretch">
+                                <Button Content="Down"
+                                        Command="{Binding SearchForwardCommand}"
+                                        CommandParameter="{Binding ElementName=SearchText, Path=Text}"
+                                        styles:Grouping.Position="Last"
+                                        DockPanel.Dock="Right" />
+                                <Button Content="Up"
+                                        Command="{Binding SearchBackwardCommand}"
+                                        CommandParameter="{Binding ElementName=SearchText, Path=Text}"
+                                        styles:Grouping.Position="Middle"
+                                        DockPanel.Dock="Right" />
+                                <TextBox HorizontalAlignment="Stretch" x:Name="SearchText"></TextBox>
+                            </DockPanel>
                             <CheckBox IsChecked="{Binding SearchCaseSensitive}">Case sensitive</CheckBox>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Command="{Binding SearchBackwardCommand}"
-                                        CommandParameter="{Binding ElementName=SearchText, Path=Text}">
-                                    Up
-                                </Button>
-                                <Button Command="{Binding SearchForwardCommand}"
-                                        CommandParameter="{Binding ElementName=SearchText, Path=Text}">
-                                    Down
-                                </Button>
-                            </StackPanel>
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Header="Processes/Threads">
@@ -116,19 +115,17 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <DockPanel LastChildFill="True">
-                                <Button
+                                <Button Content="Whitelist"
                                     CommandParameter="{Binding ElementName=SelectedProcessThreadFilter, Path=SelectedItem}"
                                     DockPanel.Dock="Right"
-                                    Command="{Binding AddWhitelistedProcessThreadFilterCommand}">
-                                    Whitelist
-                                </Button>
+                                    styles:Grouping.Position="Last"
+                                    Command="{Binding AddWhitelistedProcessThreadFilterCommand}" />
 
-                                <Button
+                                <Button Content="Blacklist"
                                     CommandParameter="{Binding ElementName=SelectedProcessThreadFilter, Path=SelectedItem}"
                                     DockPanel.Dock="Right"
-                                    Command="{Binding AddBlacklistedProcessThreadFilterCommand}">
-                                    Blacklist
-                                </Button>
+                                    styles:Grouping.Position="Middle"
+                                    Command="{Binding AddBlacklistedProcessThreadFilterCommand}" />
 
                                 <ComboBox x:Name="SelectedProcessThreadFilter"
                                           ItemsSource="{Binding AvailableProcessThreadFilters}" />
@@ -174,16 +171,16 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <DockPanel LastChildFill="True">
-                                <Button CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
+                                <Button Content="Whitelist"
+                                    CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
                                         DockPanel.Dock="Right"
-                                        Command="{Binding AddWhitelistedTagCommand}">
-                                    Whitelist
-                                </Button>
-                                <Button CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
+                                        styles:Grouping.Position="Last"
+                                        Command="{Binding AddWhitelistedTagCommand}" />
+                                <Button Content="Blacklist"
+                                    CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
                                         DockPanel.Dock="Right"
-                                        Command="{Binding AddBlacklistedTagCommand}">
-                                    Blacklist
-                                </Button>
+                                        styles:Grouping.Position="Middle"
+                                        Command="{Binding AddBlacklistedTagCommand}" />
 
                                 <ComboBox x:Name="SelectedTag"
                                           ItemsSource="{Binding AvailableTags}" />
@@ -319,16 +316,16 @@
         <Grid HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
               Background="#80000000">
-        <Grid.Style>
-            <Style TargetType="Grid">
-                <Setter Property="Visibility" Value="Visible" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding ActiveDialog}" Value="{x:Null}">
-                        <Setter Property="Visibility" Value="Hidden" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Grid.Style>
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ActiveDialog}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <ContentControl ContentTemplate="{StaticResource DialogTemplate}" Content="{Binding ActiveDialog}"/>
         </Grid>
     </Grid>
