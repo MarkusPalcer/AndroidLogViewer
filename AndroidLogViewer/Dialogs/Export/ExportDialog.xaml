@@ -6,12 +6,15 @@
         <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Width="270">
             <DockPanel HorizontalAlignment="Stretch" Margin="0,0,0,5">
                 <Button Content="..." Command="{Binding BrowseFileCommand}" DockPanel.Dock="Right" style:Grouping.Position="Last" />
-                <TextBox Text="{Binding FileName}" HorizontalAlignment="Stretch" TextWrapping="Wrap"/>
+                <TextBox Text="{Binding FileName}" 
+                         HorizontalAlignment="Stretch" 
+                         TextWrapping="Wrap"
+                         style:Grouping.Position="First" />
             </DockPanel>
             <CheckBox IsChecked="{Binding AlignColumns}" ToolTip="Pads entries with spaces, so a column has the same width across all lines">Pad with spaces</CheckBox>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="Cancel"
-                    Command="{Binding CancelCommand}"  
+                        Command="{Binding CancelCommand}"  
                         style:Grouping.Position="First"
                         Width="50"/>
                 <Button Content="Ok" 

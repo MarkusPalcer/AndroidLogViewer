@@ -14,7 +14,7 @@
             <Style TargetType="Control" x:Key="MonospaceFont">
                 <Setter Property="FontFamily" Value="Lucida Console"></Setter>
             </Style>
-            <Style TargetType="CheckBox" x:Key="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
+            <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
                 <Setter Property="Margin" Value="0,5,0,0" />
             </Style>
         </ResourceDictionary>
@@ -81,7 +81,9 @@
                                         CommandParameter="{Binding ElementName=SearchText, Path=Text}"
                                         styles:Grouping.Position="Middle"
                                         DockPanel.Dock="Right" />
-                                <TextBox HorizontalAlignment="Stretch" x:Name="SearchText"></TextBox>
+                                <TextBox x:Name="SearchText" 
+                                         HorizontalAlignment="Stretch" 
+                                         styles:Grouping.Position="First" />
                             </DockPanel>
                             <CheckBox IsChecked="{Binding SearchCaseSensitive}">Case sensitive</CheckBox>
                         </StackPanel>
