@@ -139,6 +139,7 @@
                                     Command="{Binding AddBlacklistedProcessThreadFilterCommand}" />
 
                                 <ComboBox x:Name="SelectedProcessThreadFilter"
+                                          styles:Grouping.Position="First"
                                           ItemsSource="{Binding AvailableProcessThreadFilters}" />
 
                             </DockPanel>
@@ -194,6 +195,7 @@
                                         Command="{Binding AddBlacklistedTagCommand}" />
 
                                 <ComboBox x:Name="SelectedTag"
+                                          styles:Grouping.Position="First"
                                           ItemsSource="{Binding AvailableTags}" />
 
                             </DockPanel>
