@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using AndroidLogViewer.Command;
+using AndroidLogViewer.Dialogs.Export;
+using AndroidLogViewer.Models;
 using Microsoft.Win32;
 
 namespace AndroidLogViewer.Dialogs
@@ -88,27 +90,24 @@ namespace AndroidLogViewer.Dialogs
 
             if (AlignColumns)
             {
-                var dateTimeLength = _entries.Max(x => x.Time.Length);
-                var pidLength = _entries.Max(x => x.Process.ToString().Length);
-                var tidLength = _entries.Max(x => x.Thread.ToString().Length);
-                var tagLength = _entries.Max(x => x.Tag.Length) + 1;
+                var widthCounter = new WidthCountingVisitor();
+                widthCounter.Visit(_entries);
+                var exporter = new AlignedLogExportVisitor(widthCounter);
+                exporter.Visit(_entries);
 
-                lines = _entries.Select(x => $"{x.Time.PadRight(dateTimeLength)} {x.Process.ToString().PadRight(pidLength)} {x.Thread.ToString().PadRight(tidLength)} {x.Level} {$"{x.Tag}:".PadRight(tagLength)} {x.Message}");
+                lines = exporter.LogLines;
             }
             else
             {
-                lines = _entries.Select(FormatLogEntry);
+                var visitor = new SimpleLogExportVisitor();
+                visitor.Visit(_entries);
+                lines = visitor.LogLines;
             }
             
 
             File.WriteAllLines(FileName, lines);
 
             Done(null);
-        }
-
-        public static string FormatLogEntry(LogEntry x)
-        {
-            return $"{x.Time} {x.Process} {x.Thread} {x.Level} {x.Tag}: {x.Message}";
         }
     }
 }

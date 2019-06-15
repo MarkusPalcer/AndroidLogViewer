@@ -62,8 +62,13 @@
     <Compile Include="Command\PropertyObserver.cs" />
     <Compile Include="Command\PropertyObserverNode.cs" />
     <Compile Include="Dialogs\Base\DialogViewModelBase.cs" />
+    <Compile Include="Dialogs\Export\AlignedLogExportVisitor.cs" />
     <Compile Include="Dialogs\Export\ExportDialogViewModel.cs" />
+    <Compile Include="Dialogs\Export\SimpleLogExportVisitor.cs" />
+    <Compile Include="Dialogs\Export\WidthCountingVisitor.cs" />
     <Compile Include="LogcatParser.cs" />
+    <Compile Include="Models\ILogEntryVisitor.cs" />
+    <Compile Include="Models\StartOfBufferEntry.cs" />
     <Compile Include="Properties\Annotations1.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Page Include="Dialogs\Dialogs.xaml">
@@ -108,7 +113,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="LogEntry.cs" />
+    <Compile Include="Models\LogEntry.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

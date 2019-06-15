@@ -13,6 +13,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using AndroidLogViewer.Command;
 using AndroidLogViewer.Dialogs;
+using AndroidLogViewer.Dialogs.Export;
 using AndroidLogViewer.Properties;
 using Microsoft.Win32;
 
@@ -50,7 +51,7 @@ namespace AndroidLogViewer
                 () => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(_defaultView.OfType<LogEntry>().ToArray())).FireAndForget(), 
                 () => !string.IsNullOrEmpty(FileName)).ObservesProperty(() => FileName);
             ExportSelectionCommand = new DelegateCommand<IEnumerable<object>>(x => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(x.OfType<LogEntry>().ToArray())).FireAndForget());
-            CopySelectionCommand = new DelegateCommand<IEnumerable<object>>(items => Clipboard.SetText(string.Join("\n", items.OfType<LogEntry>().Select(ExportDialogViewModel.FormatLogEntry))));
+            CopySelectionCommand = new DelegateCommand<IEnumerable<object>>(items => Clipboard.SetText(string.Join("\n", items.OfType<LogEntry>().Select(SimpleLogExportVisitor.FormatLogEntry))));
 
             OpenFileCommand = new DelegateCommand(OpenFile);
             OpenUrlCommand = new DelegateCommand(OpenUrl);
