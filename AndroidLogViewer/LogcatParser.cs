@@ -16,7 +16,7 @@ namespace AndroidLogViewer
         private static readonly string TrailingLineRegularExpression =$"(?<trailingline>\\s+?){MessageRegularExpression}";
         private static readonly string DefaultLogcatRegularExpression = $"(?<premessage>{DateTimeRegularExpression}\\s+{PidRegularExpression}\\s+{TidRegularExpression}\\s+{LogLevelRegularExpression}\\s*{TagRegularExpression}\\s+?){MessageRegularExpression}";
         private static readonly string AndroidStudioRegularExpression = $"(?<premessage>{DateTimeRegularExpression}\\s+{PidRegularExpression}-{TidRegularExpression}[^\\s]+\\s*{LogLevelRegularExpression}/{TagRegularExpression}\\s+?){MessageRegularExpression}";
-        private static readonly string StartOfLogExpression = "(?<startoflog>\\s*)(?<dashes>-+)(?<message>.*)";
+        private static readonly string StartOfLogExpression = "(?<startoflog>\\s*)(?<message>-+?.*)";
         
         
         private static readonly string[] RecognizedRegularExpressions = {DefaultLogcatRegularExpression, AndroidStudioRegularExpression, TrailingLineRegularExpression, StartOfLogExpression};
@@ -60,7 +60,7 @@ namespace AndroidLogViewer
                     }
                     else if (match.Groups["startoflog"].Success)
                     {
-                        newEntry = new LogEntry
+                        newEntry = new StartOfBufferEntry
                         {
                             Tag = match.Groups["dashes"].Value.Trim(),
                             Time = match.Groups["startoflog"].Value.Trim(),

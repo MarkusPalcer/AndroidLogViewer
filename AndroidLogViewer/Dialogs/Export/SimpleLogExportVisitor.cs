@@ -22,7 +22,7 @@ namespace AndroidLogViewer.Dialogs.Export
 
         public void Visit(StartOfBufferEntry x)
         {
-            LogLines.Add($"{x.Time}{x.Tag}{x.Message}");
+            LogLines.Add($"{x.Time}{x.Message}");
         }
 
         public static string FormatLogEntry(LogEntry x)
