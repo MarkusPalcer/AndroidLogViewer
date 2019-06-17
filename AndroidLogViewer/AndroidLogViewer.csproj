@@ -66,6 +66,7 @@
     <Compile Include="Dialogs\Export\ExportDialogViewModel.cs" />
     <Compile Include="Dialogs\Export\SimpleLogExportVisitor.cs" />
     <Compile Include="Dialogs\Export\WidthCountingVisitor.cs" />
+    <Compile Include="Extensions\TextReaderExtensions.cs" />
     <Compile Include="LogcatParser.cs" />
     <Compile Include="Models\ILogEntryVisitor.cs" />
     <Compile Include="Models\StartOfBufferEntry.cs" />
