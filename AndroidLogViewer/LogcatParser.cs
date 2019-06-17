@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AndroidLogViewer.Extensions;
 
 namespace AndroidLogViewer
 {
@@ -16,7 +17,7 @@ namespace AndroidLogViewer
         private static readonly string TrailingLineRegularExpression =$"(?<trailingline>\\s+?){MessageRegularExpression}";
         private static readonly string DefaultLogcatRegularExpression = $"(?<premessage>{DateTimeRegularExpression}\\s+{PidRegularExpression}\\s+{TidRegularExpression}\\s+{LogLevelRegularExpression}\\s*{TagRegularExpression}\\s+?){MessageRegularExpression}";
         private static readonly string AndroidStudioRegularExpression = $"(?<premessage>{DateTimeRegularExpression}\\s+{PidRegularExpression}-{TidRegularExpression}[^\\s]+\\s*{LogLevelRegularExpression}/{TagRegularExpression}\\s+?){MessageRegularExpression}";
-        private static readonly string StartOfLogExpression = "(?<startoflog>\\s*---+)(?<message>.*)";
+        private static readonly string StartOfLogExpression = "(?<startoflog>\\s*)(?<message>-+?.*)";
         
         
         private static readonly string[] RecognizedRegularExpressions = {DefaultLogcatRegularExpression, AndroidStudioRegularExpression, TrailingLineRegularExpression, StartOfLogExpression};
@@ -33,59 +34,56 @@ namespace AndroidLogViewer
             LogEntry pivotEntry = null;
             var pivotSize = 0;
 
-            var line = reader.ReadLine();
-
-            while (line != null)
+            foreach (var line in reader.GetLines())
             {
                 var match = RegularExpression.Match(line);
 
-                if (match.Success)
-                {
-                    LogEntry newEntry = null;
+                if (!match.Success) continue;
+
+                LogEntry newEntry = null;
                     
-                    if (match.Groups["datetime"].Success)
+                if (match.Groups["datetime"].Success)
+                {
+                    newEntry = new LogEntry
                     {
-                        newEntry = new LogEntry
-                        {
-                            Message = match.Groups["message"].Value.Trim(),
-                            Level = match.Groups["level"].Value.Trim(),
-                            Process = int.Parse(match.Groups["pid"].Value.Trim()),
-                            Thread = int.Parse(match.Groups["tid"].Value.Trim()),
-                            Tag = match.Groups["tag"].Value.Trim(),
-                            Time = match.Groups["datetime"].Value.Trim(),
-                        };
-                        if (match.Groups["premessage"].Success) pivotSize = match.Groups["premessage"].Length;
+                        Message = match.Groups["message"].Value.Trim(),
+                        Level = match.Groups["level"].Value.Trim(),
+                        Process = int.Parse(match.Groups["pid"].Value.Trim()),
+                        Thread = int.Parse(match.Groups["tid"].Value.Trim()),
+                        Tag = match.Groups["tag"].Value.Trim(),
+                        Time = match.Groups["datetime"].Value.Trim(),
+                    };
+                    if (match.Groups["premessage"].Success) pivotSize = match.Groups["premessage"].Length;
 
-                        pivotEntry = newEntry;
-                    }
-                    else if (match.Groups["startoflog"].Success)
+                    pivotEntry = newEntry;
+                }
+                else if (match.Groups["startoflog"].Success)
+                {
+                    newEntry = new StartOfBufferEntry
                     {
-                        newEntry = new LogEntry
-                        {
-                            Message = $"--- {match.Groups["message"].Value.Trim()}"
-                        };
-                    }
-                    else if (match.Groups["trailingline"].Success && pivotEntry != null)
+                        Tag = match.Groups["dashes"].Value.Trim(),
+                        Time = match.Groups["startoflog"].Value.Trim(),
+                        Message = match.Groups["message"].Value.Trim()
+                    };
+                }
+                else if (match.Groups["trailingline"].Success && pivotEntry != null)
+                {
+                    var trimmedMessage = match.Groups["message"].Value.Trim();
+                    var originalSpaceCount = match.Groups["message"].Length - trimmedMessage.Length + 1;
+                    var messageSpaceCount = originalSpaceCount - pivotSize;
+
+                    newEntry = new LogEntry
                     {
-                        var trimmedMessage = match.Groups["message"].Value.Trim();
-                        var originalSpaceCount = match.Groups["message"].Length - trimmedMessage.Length + 1;
-                        var messageSpaceCount = originalSpaceCount - pivotSize;
-
-                        newEntry = new LogEntry
-                        {
-                            Message = new string(' ', messageSpaceCount) + trimmedMessage,
-                            Level = pivotEntry.Level,
-                            Process = pivotEntry.Process,
-                            Thread = pivotEntry.Thread,
-                            Tag = pivotEntry.Tag,
-                            Time = pivotEntry.Time,
-                        };
-                    }
-
-                    if (newEntry != null) result.Add(newEntry);
+                        Message = new string(' ', messageSpaceCount) + trimmedMessage,
+                        Level = pivotEntry.Level,
+                        Process = pivotEntry.Process,
+                        Thread = pivotEntry.Thread,
+                        Tag = pivotEntry.Tag,
+                        Time = pivotEntry.Time,
+                    };
                 }
 
-                line = reader.ReadLine();
+                if (newEntry != null) result.Add(newEntry);
             }
 
             return result;

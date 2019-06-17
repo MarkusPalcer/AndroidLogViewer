@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using AndroidLogViewer.Models;
 using AndroidLogViewer.Properties;
 
 namespace AndroidLogViewer
@@ -26,5 +27,7 @@ namespace AndroidLogViewer
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public virtual void Accept(ILogEntryVisitor visitor) { visitor.Visit(this); }
     }
 }

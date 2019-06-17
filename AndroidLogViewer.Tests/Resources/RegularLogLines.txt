@@ -1,0 +1,3 @@
+01-03 22:54:50.529   223   261 I audio_hw_primary: start_output_stream_primary... 0xabd53380, device 2
+01-03 22:54:50.531   223   261 W audio_hw_primary: card 0, port 0 device 0x2
+01-03 22:54:50.531   223   261 W audio_hw_primary: rate 48000, channel 2 period_size 0xc0
