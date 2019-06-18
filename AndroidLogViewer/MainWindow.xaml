@@ -45,24 +45,31 @@
             <Menu Grid.Row="0"
                   Grid.Column="0"
                   Grid.ColumnSpan="2">
-                <MenuItem Header="_File">
+                <MenuItem Header="_File" 
+                          Template="{StaticResource RootMenuItemTemplate}">
                     <MenuItem Header="_Open" 
-                              Command="{Binding OpenFileCommand}" />
+                              Command="{Binding OpenFileCommand}" 
+                              Template="{StaticResource MenuEntryTemplate}"/>
                     <MenuItem Header="Open _URL" 
-                              Command="{Binding OpenUrlCommand}" />
+                              Command="{Binding OpenUrlCommand}" 
+                              Template="{StaticResource MenuEntryTemplate}"/>
                     <MenuItem Header="Open from Clipboard" 
                               Command="{Binding ImportClipboardCommand}" 
-                              InputGestureText="CTRL+SHIFT+V" />
-                    <Separator />
+                              InputGestureText="CTRL+SHIFT+V" 
+                              Template="{StaticResource MenuEntryTemplate}"/>
+                    <Separator Style="{StaticResource SeparatorStyle}" />
                     <MenuItem Header="_Export filtered log" 
-                              Command="{Binding ExportCommand}" />
-                    <Separator />
+                              Command="{Binding ExportCommand}"
+                              Template="{StaticResource MenuEntryTemplate}"/>
+                    <Separator Style="{StaticResource SeparatorStyle}" />
                     <MenuItem Header="E_xit" 
-                              Click="CloseWindow" />
+                              Click="CloseWindow"
+                              Template="{StaticResource MenuEntryTemplate}"/>
                 </MenuItem>
             </Menu>
 
-            <ScrollViewer Grid.Row="1"
+            <ScrollViewer x:Name="Sidebar"
+                          Grid.Row="1"
                           Grid.Column="0"
                           HorizontalScrollBarVisibility="Hidden"
                           VerticalScrollBarVisibility="Auto">
@@ -214,7 +221,6 @@
                 </StackPanel>
             </ScrollViewer>
 
-
             <ListView x:Name="LogItems"
                       Grid.Row="1"
                       Grid.Column="1"
@@ -228,7 +234,8 @@
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
                         <MenuItem
-                            Command="{Binding Path=DataContext.ShowOnlyProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.ShowOnlyProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock
                                     Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this process ({0}/*)'}">
@@ -236,7 +243,8 @@
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem
-                            Command="{Binding Path=DataContext.ShowOnlyThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.ShowOnlyThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock>
                                     <TextBlock.Text>
@@ -251,7 +259,8 @@
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem
-                            Command="{Binding Path=DataContext.HideProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.HideProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock
                                     Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this process ({0}/*)'}">
@@ -259,7 +268,8 @@
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem
-                            Command="{Binding Path=DataContext.HideThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.HideThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock>
                                     <TextBlock.Text>
@@ -275,7 +285,8 @@
                         </MenuItem>
 
                         <MenuItem
-                            Command="{Binding Path=DataContext.ShowOnlyTagForSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.ShowOnlyTagForSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock
                                     Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this tag ({0})'}">
@@ -284,7 +295,8 @@
                         </MenuItem>
 
                         <MenuItem
-                            Command="{Binding Path=DataContext.HideTagOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.HideTagOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock
                                     Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this tag ({0})'}">
@@ -292,17 +304,18 @@
                             </MenuItem.Header>
                         </MenuItem>
 
-                        <MenuItem
-                            Command="{Binding Path=DataContext.RemoveLeadingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
-                            Header="Delete all lines before this" />
+                        <MenuItem Header="Delete all lines before this" 
+                                  Command="{Binding Path=DataContext.RemoveLeadingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                                  Template="{StaticResource MenuEntryTemplate}"/>
 
-                        <MenuItem
-                            Command="{Binding Path=DataContext.RemoveTrailingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
-                            Header="Delete all lines after this" />
+                        <MenuItem Header="Delete all lines after this"
+                                  Command="{Binding Path=DataContext.RemoveTrailingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                                  Template="{StaticResource MenuEntryTemplate}"/>
 
                         <MenuItem Header="Export selected items"
-                            CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
-                            Command="{Binding Path=DataContext.ExportSelectionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}" />
+                                  CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                                  Command="{Binding Path=DataContext.ExportSelectionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}" 
+                                  Template="{StaticResource MenuEntryTemplate}"/>
                     </ContextMenu>
                 </ListView.Resources>
                 <ListView.View>

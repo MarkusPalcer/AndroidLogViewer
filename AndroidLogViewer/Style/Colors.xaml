@@ -13,4 +13,5 @@
     <SolidColorBrush x:Key="DarkestOrange">#55411b</SolidColorBrush>
     <SolidColorBrush x:Key="RegularGreenNoSaturation">#8b8b8b</SolidColorBrush>
     <SolidColorBrush x:Key="DarkerGreenNoSaturation">#565656</SolidColorBrush>
+
 </ResourceDictionary>

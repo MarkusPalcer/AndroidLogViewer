@@ -166,7 +166,7 @@
                             BorderThickness="1"
                             Padding="1"
                             CornerRadius="0,0,5,5"
-                            Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+                            Background="White">
                         <ScrollViewer x:Name="DropDownScrollViewer">
                             <Grid x:Name="grid" RenderOptions.ClearTypeHint="Enabled">
                                 <Canvas x:Name="canvas" HorizontalAlignment="Left" Height="0"
