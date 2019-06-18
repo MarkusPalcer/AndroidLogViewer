@@ -322,7 +322,7 @@
                 </ListView.ItemContainerStyle>
             </ListView>
 
-            <GridSplitter Grid.Row="1" Grid.Column="1" ResizeDirection="Columns" Width="5" VerticalAlignment="Stretch"
+            <GridSplitter Grid.Row="1" Grid.Column="1" ResizeDirection="Columns" VerticalAlignment="Stretch"
                           HorizontalAlignment="Left" />
         </Grid>
 

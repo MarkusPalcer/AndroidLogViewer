@@ -7,5 +7,6 @@
         <ResourceDictionary Source="TextBox.xaml" />
         <ResourceDictionary Source="ComboBox.xaml" />
         <ResourceDictionary Source="GroupBox.xaml" />
+        <ResourceDictionary Source="GridSplitter.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
