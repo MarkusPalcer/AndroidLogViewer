@@ -224,8 +224,8 @@
             <ListView x:Name="LogItems"
                       Grid.Row="1"
                       Grid.Column="1"
+                      Margin="7,0,0,0"
                       ItemsSource="{Binding LogEntries}"
-                      Style="{StaticResource MonospaceFont}"
                       SelectedIndex="{Binding SelectedLogEntryIndex}"
                       SelectedItem="{Binding Path=SelectedLogEntry, Mode=OneWayToSource}">
                 <ListView.CommandBindings>
@@ -329,7 +329,7 @@
                     </GridView>
                 </ListView.View>
                 <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}">
+                    <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
                         <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
                     </Style>
                 </ListView.ItemContainerStyle>

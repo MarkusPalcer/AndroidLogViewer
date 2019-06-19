@@ -1,10 +1,13 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Color x:Key="HighlightGreenColor">#90aa00</Color>
+    <Color x:Key="MouseOverColor">#4490aa00</Color>
+    <Color x:Key="MouseOverColorNoSaturation">#44aaaaaa</Color>
 
     <SolidColorBrush x:Key="DarkestHighlightGreen" Color="#3b4500" />
     <SolidColorBrush x:Key="DarkerHighlightGreen" Color="#5b6b00" />
     <SolidColorBrush x:Key="HighlightGreen" Color="{StaticResource HighlightGreenColor}" />
+    <SolidColorBrush x:Key="MouseOverGreen" Color="{StaticResource MouseOverColor}" />
     <SolidColorBrush x:Key="RegularGreen">#4c8b4c</SolidColorBrush>
     <SolidColorBrush x:Key="DarkerGreen">#2f562f</SolidColorBrush>
     <SolidColorBrush x:Key="DarkestGreen">#1a301a</SolidColorBrush>
@@ -13,5 +16,7 @@
     <SolidColorBrush x:Key="DarkestOrange">#55411b</SolidColorBrush>
     <SolidColorBrush x:Key="RegularGreenNoSaturation">#8b8b8b</SolidColorBrush>
     <SolidColorBrush x:Key="DarkerGreenNoSaturation">#565656</SolidColorBrush>
+    <SolidColorBrush x:Key="HighlightGreenNoSaturation">#aaaaaa</SolidColorBrush>
+    <SolidColorBrush x:Key="MouseOverNoSaturation" Color="{StaticResource MouseOverColorNoSaturation}" />
 
 </ResourceDictionary>

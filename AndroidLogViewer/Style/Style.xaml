@@ -9,5 +9,6 @@
         <ResourceDictionary Source="GridSplitter.xaml" />
         <ResourceDictionary Source="Menu.xaml" />
         <ResourceDictionary Source="MenuItem.xaml" />
+        <ResourceDictionary Source="ListView.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

@@ -93,7 +93,7 @@
                 <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
             </Trigger>
             <Trigger Property="IsHighlighted" Value="True">
-                <Setter Property="Background" TargetName="templateRoot" Value="#4490aa00"/>
+                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MouseOverGreen}"/>
                 <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource HighlightGreen}"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
@@ -191,8 +191,8 @@
                 <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
             </Trigger>
             <Trigger Property="IsHighlighted" Value="True">
-                <Setter Property="Background" TargetName="templateRoot" Value="#4490aa00"/>
-                <Setter Property="BorderBrush" TargetName="templateRoot" Value="#4490aa00"/>
+                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MouseOverGreen}"/>
+                <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource MouseOverGreen}"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="#FF707070"/>
