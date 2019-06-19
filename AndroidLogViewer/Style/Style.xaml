@@ -10,5 +10,6 @@
         <ResourceDictionary Source="Menu.xaml" />
         <ResourceDictionary Source="MenuItem.xaml" />
         <ResourceDictionary Source="ListView.xaml"/>
+        <ResourceDictionary Source="ScrollBar.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

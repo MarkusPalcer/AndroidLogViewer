@@ -3,19 +3,27 @@
     <Color x:Key="HighlightGreenColor">#90aa00</Color>
     <Color x:Key="MouseOverColor">#4490aa00</Color>
     <Color x:Key="MouseOverColorNoSaturation">#44aaaaaa</Color>
+    <Color x:Key="RegularGreenColorNoSaturation">#8b8b8b</Color>
+    <Color x:Key="DarkerGreenColorNoSaturation">#565656</Color>
+    <Color x:Key="RegularGreenColor">#4c8b4c</Color>
+    <Color x:Key="DarkerGreenColor">#2f562f</Color>
+    <Color x:Key="DarkestGreenColor">#1a301a</Color>
+    <Color x:Key="RegularOrangeColor">#d7a445</Color>
+    <Color x:Key="DarkerOrangeColor">#9e7832</Color>
+    <Color x:Key="DarkestOrangeColor">#55411b</Color>
 
     <SolidColorBrush x:Key="DarkestHighlightGreen" Color="#3b4500" />
     <SolidColorBrush x:Key="DarkerHighlightGreen" Color="#5b6b00" />
     <SolidColorBrush x:Key="HighlightGreen" Color="{StaticResource HighlightGreenColor}" />
     <SolidColorBrush x:Key="MouseOverGreen" Color="{StaticResource MouseOverColor}" />
-    <SolidColorBrush x:Key="RegularGreen">#4c8b4c</SolidColorBrush>
-    <SolidColorBrush x:Key="DarkerGreen">#2f562f</SolidColorBrush>
-    <SolidColorBrush x:Key="DarkestGreen">#1a301a</SolidColorBrush>
-    <SolidColorBrush x:Key="RegularOrange">#d7a445</SolidColorBrush>
-    <SolidColorBrush x:Key="DarkerOrange">#9e7832</SolidColorBrush>
-    <SolidColorBrush x:Key="DarkestOrange">#55411b</SolidColorBrush>
-    <SolidColorBrush x:Key="RegularGreenNoSaturation">#8b8b8b</SolidColorBrush>
-    <SolidColorBrush x:Key="DarkerGreenNoSaturation">#565656</SolidColorBrush>
+    <SolidColorBrush x:Key="RegularGreen" Color="{StaticResource RegularGreenColor}" />
+    <SolidColorBrush x:Key="DarkerGreen" Color="{StaticResource DarkerGreenColor}" />
+    <SolidColorBrush x:Key="DarkestGreen" Color="{StaticResource DarkestGreenColor}" />
+    <SolidColorBrush x:Key="RegularOrange" Color="{StaticResource RegularOrangeColor}" />
+    <SolidColorBrush x:Key="DarkerOrange" Color="{StaticResource DarkerOrangeColor}" />
+    <SolidColorBrush x:Key="DarkestOrange" Color="{StaticResource DarkestOrangeColor}" />
+    <SolidColorBrush x:Key="RegularGreenNoSaturation" Color="{StaticResource RegularGreenColorNoSaturation}" />
+    <SolidColorBrush x:Key="DarkerGreenNoSaturation" Color="{StaticResource DarkerGreenColorNoSaturation}" />
     <SolidColorBrush x:Key="HighlightGreenNoSaturation">#aaaaaa</SolidColorBrush>
     <SolidColorBrush x:Key="MouseOverNoSaturation" Color="{StaticResource MouseOverColorNoSaturation}" />
 

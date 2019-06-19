@@ -227,7 +227,7 @@
                       Margin="7,0,0,0"
                       ItemsSource="{Binding LogEntries}"
                       SelectedIndex="{Binding SelectedLogEntryIndex}"
-                      SelectedItem="{Binding Path=SelectedLogEntry, Mode=OneWayToSource}">
+                      SelectedItem="{Binding Path=SelectedLogEntry, Mode=OneWayToSource}" >
                 <ListView.CommandBindings>
                     <CommandBinding Command="Copy" Executed="ExecuteCopyLogItems"/>
                 </ListView.CommandBindings>
