@@ -13,10 +13,12 @@
             HorizontalAlignment="Center" 
             VerticalAlignment="Center">
             <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="White" RadiusX="10" RadiusY="10" />
-            <StackPanel Margin="20" Orientation="Vertical">
-                <TextBlock FontSize="16" Text="{Binding Title}" />
-                <ContentControl Content="{Binding}" Margin="0,20,0,0"/>
-            </StackPanel>
+                <StackPanel Margin="20" Orientation="Vertical">
+                    <Border BorderBrush="Black" BorderThickness="0,0,0,1" Padding="0,0,0,3">
+                        <TextBlock FontSize="16" Text="{Binding Title}" />
+                    </Border>
+                    <ContentControl Content="{Binding}" Margin="0,20,0,0" />
+                </StackPanel>
             <Button Command="{Binding CancelCommand}"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"

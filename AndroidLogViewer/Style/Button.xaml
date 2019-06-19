@@ -1,0 +1,86 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:styles="clr-namespace:AndroidLogViewer.Style">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Colors.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <ControlTemplate TargetType="{x:Type Button}" x:Key="ButtonTemplate">
+        <Border x:Name="border" 
+                BorderBrush="{TemplateBinding BorderBrush}" 
+                BorderThickness="{TemplateBinding BorderThickness}" 
+                Background="{TemplateBinding Background}" 
+                CornerRadius="5,5,5,5"
+                Padding="2,0,2,0"
+                SnapsToDevicePixels="True">
+            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="styles:Grouping.Position" Value="First">
+                <Setter TargetName="border" Property="CornerRadius" Value="5,0,0,5" />
+                <Setter Property="Margin" Value="0,0,1,0"/>
+            </Trigger>
+            <Trigger Property="styles:Grouping.Position" Value="Middle">
+                <Setter TargetName="border" Property="CornerRadius" Value="0,0,0,0" />
+                <Setter Property="Margin" Value="1,0,1,0"/>
+            </Trigger>
+            <Trigger Property="styles:Grouping.Position" Value="Last">
+                <Setter TargetName="border" Property="CornerRadius" Value="0,5,5,0" />
+                <Setter Property="Margin" Value="1,0,0,0"/>
+            </Trigger>
+            <Trigger Property="styles:Grouping.Position" Value="Single">
+                <Setter Property="Margin" Value="5,0,5,0"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    
+    <Style TargetType="Button" x:Key="{x:Type Button}">
+        <Setter Property="Background" Value="{StaticResource RegularGreen}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DarkerGreen}" />
+        <Setter Property="Template" Value="{StaticResource ButtonTemplate}"/>
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="3" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsDefault" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource DarkerGreen}" />
+                <Setter Property="BorderBrush" Value="{StaticResource DarkestGreen}" />
+            </MultiTrigger>
+
+            <Trigger Property="IsDefault" Value="True">
+                <Setter Property="Background" Value="{StaticResource HighlightGreen}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource DarkerHighlightGreen}" />
+            </Trigger>
+            
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsDefault" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource DarkerHighlightGreen}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource DarkestHighlightGreen}" />
+            </MultiTrigger>
+
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource RegularOrange}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource DarkerOrange}" />
+            </Trigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{StaticResource RegularGreenNoSaturation}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource DarkerGreenNoSaturation}"/>
+            </Trigger>
+
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="BorderThickness" Value="4"/>
+                <Setter Property="Padding" Value="0"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

@@ -5,17 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AndroidLogViewer"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:styles="clr-namespace:AndroidLogViewer.Style"
         mc:Ignorable="d"
         Title="Android Log Viewer" Height="450" Width="800"
         x:Name="Root">
     <Window.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Dialogs/Dialogs.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <Style TargetType="Control" x:Key="MonospaceFont">
                 <Setter Property="FontFamily" Value="Lucida Console"></Setter>
+            </Style>
+            <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                <Setter Property="Margin" Value="0,5,0,0" />
             </Style>
         </ResourceDictionary>
     </Window.Resources>
@@ -38,25 +38,38 @@
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="4*" />
             </Grid.ColumnDefinitions>
 
             <Menu Grid.Row="0"
                   Grid.Column="0"
                   Grid.ColumnSpan="2">
-                <MenuItem Header="_File">
-                    <MenuItem Header="_Open" Command="{Binding OpenFileCommand}" />
-                    <MenuItem Header="Open _URL" Command="{Binding OpenUrlCommand}" />
-                    <MenuItem Header="Open from Clipboard" Command="{Binding ImportClipboardCommand}" InputGestureText="CTRL+SHIFT+V" />
-                    <Separator />
-                    <MenuItem Header="_Export filtered log" Command="{Binding ExportCommand}" />
-                    <Separator />
-                    <MenuItem Header="E_xit" Click="CloseWindow" />
+                <MenuItem Header="_File" 
+                          Template="{StaticResource RootMenuItemTemplate}">
+                    <MenuItem Header="_Open" 
+                              Command="{Binding OpenFileCommand}" 
+                              Template="{StaticResource MenuEntryTemplate}"/>
+                    <MenuItem Header="Open _URL" 
+                              Command="{Binding OpenUrlCommand}" 
+                              Template="{StaticResource MenuEntryTemplate}"/>
+                    <MenuItem Header="Open from Clipboard" 
+                              Command="{Binding ImportClipboardCommand}" 
+                              InputGestureText="CTRL+SHIFT+V" 
+                              Template="{StaticResource MenuEntryTemplate}"/>
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+                    <MenuItem Header="_Export filtered log" 
+                              Command="{Binding ExportCommand}"
+                              Template="{StaticResource MenuEntryTemplate}"/>
+                    <Separator Style="{StaticResource SeparatorStyle}" />
+                    <MenuItem Header="E_xit" 
+                              Click="CloseWindow"
+                              Template="{StaticResource MenuEntryTemplate}"/>
                 </MenuItem>
             </Menu>
 
-            <ScrollViewer Grid.Row="1"
+            <ScrollViewer x:Name="Sidebar"
+                          Grid.Row="1"
                           Grid.Column="0"
                           HorizontalScrollBarVisibility="Hidden"
                           VerticalScrollBarVisibility="Auto">
@@ -64,18 +77,22 @@
                 <StackPanel Orientation="Vertical">
                     <GroupBox Header="Search">
                         <StackPanel Orientation="Vertical">
-                            <TextBox HorizontalAlignment="Stretch" x:Name="SearchText"></TextBox>
+                            <DockPanel VerticalAlignment="Stretch">
+                                <Button Content="Down"
+                                        Command="{Binding SearchForwardCommand}"
+                                        CommandParameter="{Binding ElementName=SearchText, Path=Text}"
+                                        styles:Grouping.Position="Last"
+                                        DockPanel.Dock="Right" />
+                                <Button Content="Up"
+                                        Command="{Binding SearchBackwardCommand}"
+                                        CommandParameter="{Binding ElementName=SearchText, Path=Text}"
+                                        styles:Grouping.Position="Middle"
+                                        DockPanel.Dock="Right" />
+                                <TextBox x:Name="SearchText" 
+                                         HorizontalAlignment="Stretch" 
+                                         styles:Grouping.Position="First" />
+                            </DockPanel>
                             <CheckBox IsChecked="{Binding SearchCaseSensitive}">Case sensitive</CheckBox>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Command="{Binding SearchBackwardCommand}"
-                                        CommandParameter="{Binding ElementName=SearchText, Path=Text}">
-                                    Up
-                                </Button>
-                                <Button Command="{Binding SearchForwardCommand}"
-                                        CommandParameter="{Binding ElementName=SearchText, Path=Text}">
-                                    Down
-                                </Button>
-                            </StackPanel>
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Header="Processes/Threads">
@@ -116,21 +133,20 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <DockPanel LastChildFill="True">
-                                <Button
+                                <Button Content="Whitelist"
                                     CommandParameter="{Binding ElementName=SelectedProcessThreadFilter, Path=SelectedItem}"
                                     DockPanel.Dock="Right"
-                                    Command="{Binding AddWhitelistedProcessThreadFilterCommand}">
-                                    Whitelist
-                                </Button>
+                                    styles:Grouping.Position="Last"
+                                    Command="{Binding AddWhitelistedProcessThreadFilterCommand}" />
 
-                                <Button
+                                <Button Content="Blacklist"
                                     CommandParameter="{Binding ElementName=SelectedProcessThreadFilter, Path=SelectedItem}"
                                     DockPanel.Dock="Right"
-                                    Command="{Binding AddBlacklistedProcessThreadFilterCommand}">
-                                    Blacklist
-                                </Button>
+                                    styles:Grouping.Position="Middle"
+                                    Command="{Binding AddBlacklistedProcessThreadFilterCommand}" />
 
                                 <ComboBox x:Name="SelectedProcessThreadFilter"
+                                          styles:Grouping.Position="First"
                                           ItemsSource="{Binding AvailableProcessThreadFilters}" />
 
                             </DockPanel>
@@ -174,18 +190,19 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <DockPanel LastChildFill="True">
-                                <Button CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
+                                <Button Content="Whitelist"
+                                    CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
                                         DockPanel.Dock="Right"
-                                        Command="{Binding AddWhitelistedTagCommand}">
-                                    Whitelist
-                                </Button>
-                                <Button CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
+                                        styles:Grouping.Position="Last"
+                                        Command="{Binding AddWhitelistedTagCommand}" />
+                                <Button Content="Blacklist"
+                                    CommandParameter="{Binding ElementName=SelectedTag, Path=SelectedItem}"
                                         DockPanel.Dock="Right"
-                                        Command="{Binding AddBlacklistedTagCommand}">
-                                    Blacklist
-                                </Button>
+                                        styles:Grouping.Position="Middle"
+                                        Command="{Binding AddBlacklistedTagCommand}" />
 
                                 <ComboBox x:Name="SelectedTag"
+                                          styles:Grouping.Position="First"
                                           ItemsSource="{Binding AvailableTags}" />
 
                             </DockPanel>
@@ -193,32 +210,32 @@
                     </GroupBox>
 
                     <GroupBox Header="Log Level">
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox IsChecked="{Binding ShowVerbose}">V</CheckBox>
-                            <CheckBox IsChecked="{Binding ShowDebug}">D</CheckBox>
-                            <CheckBox IsChecked="{Binding ShowInfo}">I</CheckBox>
-                            <CheckBox IsChecked="{Binding ShowWarn}">W</CheckBox>
-                            <CheckBox IsChecked="{Binding ShowError}">E</CheckBox>
+                        <StackPanel Orientation="Vertical">
+                            <CheckBox IsChecked="{Binding ShowVerbose}">Verbose</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowDebug}">Debug</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowInfo}">Info</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowWarn}">Warning</CheckBox>
+                            <CheckBox IsChecked="{Binding ShowError}">Error</CheckBox>
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>
             </ScrollViewer>
 
-
             <ListView x:Name="LogItems"
                       Grid.Row="1"
                       Grid.Column="1"
+                      Margin="7,0,0,0"
                       ItemsSource="{Binding LogEntries}"
-                      Style="{StaticResource MonospaceFont}"
                       SelectedIndex="{Binding SelectedLogEntryIndex}"
-                      SelectedItem="{Binding Path=SelectedLogEntry, Mode=OneWayToSource}">
+                      SelectedItem="{Binding Path=SelectedLogEntry, Mode=OneWayToSource}" >
                 <ListView.CommandBindings>
                     <CommandBinding Command="Copy" Executed="ExecuteCopyLogItems"/>
                 </ListView.CommandBindings>
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
                         <MenuItem
-                            Command="{Binding Path=DataContext.ShowOnlyProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.ShowOnlyProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock
                                     Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this process ({0}/*)'}">
@@ -226,7 +243,8 @@
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem
-                            Command="{Binding Path=DataContext.ShowOnlyThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.ShowOnlyThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock>
                                     <TextBlock.Text>
@@ -241,7 +259,8 @@
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem
-                            Command="{Binding Path=DataContext.HideProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.HideProcessOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock
                                     Text="{Binding Path=SelectedItem.Process, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this process ({0}/*)'}">
@@ -249,7 +268,8 @@
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem
-                            Command="{Binding Path=DataContext.HideThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.HideThreadOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock>
                                     <TextBlock.Text>
@@ -265,7 +285,8 @@
                         </MenuItem>
 
                         <MenuItem
-                            Command="{Binding Path=DataContext.ShowOnlyTagForSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.ShowOnlyTagForSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock
                                     Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Show only this tag ({0})'}">
@@ -274,7 +295,8 @@
                         </MenuItem>
 
                         <MenuItem
-                            Command="{Binding Path=DataContext.HideTagOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}">
+                            Command="{Binding Path=DataContext.HideTagOfSelectedItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                            Template="{StaticResource MenuEntryTemplate}">
                             <MenuItem.Header>
                                 <TextBlock
                                     Text="{Binding Path=SelectedItem.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}, StringFormat='Hide this tag ({0})'}">
@@ -282,17 +304,18 @@
                             </MenuItem.Header>
                         </MenuItem>
 
-                        <MenuItem
-                            Command="{Binding Path=DataContext.RemoveLeadingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
-                            Header="Delete all lines before this" />
+                        <MenuItem Header="Delete all lines before this" 
+                                  Command="{Binding Path=DataContext.RemoveLeadingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                                  Template="{StaticResource MenuEntryTemplate}"/>
 
-                        <MenuItem
-                            Command="{Binding Path=DataContext.RemoveTrailingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
-                            Header="Delete all lines after this" />
+                        <MenuItem Header="Delete all lines after this"
+                                  Command="{Binding Path=DataContext.RemoveTrailingLinesCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                                  Template="{StaticResource MenuEntryTemplate}"/>
 
                         <MenuItem Header="Export selected items"
-                            CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
-                            Command="{Binding Path=DataContext.ExportSelectionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}" />
+                                  CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}"
+                                  Command="{Binding Path=DataContext.ExportSelectionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListView}}" 
+                                  Template="{StaticResource MenuEntryTemplate}"/>
                     </ContextMenu>
                 </ListView.Resources>
                 <ListView.View>
@@ -306,29 +329,29 @@
                     </GridView>
                 </ListView.View>
                 <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}">
+                    <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
                         <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
                     </Style>
                 </ListView.ItemContainerStyle>
             </ListView>
 
-            <GridSplitter Grid.Row="1" Grid.Column="1" ResizeDirection="Columns" Width="5" VerticalAlignment="Stretch"
+            <GridSplitter Grid.Row="1" Grid.Column="1" ResizeDirection="Columns" VerticalAlignment="Stretch"
                           HorizontalAlignment="Left" />
         </Grid>
 
         <Grid HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
               Background="#80000000">
-        <Grid.Style>
-            <Style TargetType="Grid">
-                <Setter Property="Visibility" Value="Visible" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding ActiveDialog}" Value="{x:Null}">
-                        <Setter Property="Visibility" Value="Hidden" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Grid.Style>
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ActiveDialog}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <ContentControl ContentTemplate="{StaticResource DialogTemplate}" Content="{Binding ActiveDialog}"/>
         </Grid>
     </Grid>

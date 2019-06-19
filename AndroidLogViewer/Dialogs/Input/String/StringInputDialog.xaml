@@ -1,14 +1,24 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:androidLogViewer="clr-namespace:AndroidLogViewer"
-                    xmlns:dialogs="clr-namespace:AndroidLogViewer.Dialogs">
+                    xmlns:dialogs="clr-namespace:AndroidLogViewer.Dialogs"
+                    xmlns:style="clr-namespace:AndroidLogViewer.Style">
     <DataTemplate DataType="{x:Type dialogs:StringInputDialogViewModel}">
         <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" MinWidth="250">
             <TextBlock Text="{Binding Prompt}" HorizontalAlignment="Left" />
             <TextBox Text="{Binding EnteredValue}" HorizontalAlignment="Stretch" Margin="0,10"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Command="{Binding CancelCommand}" Margin="10,0" Height="25" Width="50">Cancel</Button>
-                <Button Command="{Binding ConfirmCommand}" Margin="10,0,0,0" Height="25" Width="50">Ok</Button>
+                <Button Content="Cancel"
+                        Command="{Binding CancelCommand}" 
+                        Height="25" 
+                        Width="50" 
+                        IsCancel="True"
+                        style:Grouping.Position="First" />
+                <Button Content="Ok"
+                        Command="{Binding ConfirmCommand}"
+                        Height="25" 
+                        Width="50"
+                        IsDefault="True"
+                        style:Grouping.Position="Last" />
             </StackPanel>
         </StackPanel>
     </DataTemplate>
