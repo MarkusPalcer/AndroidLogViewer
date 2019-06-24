@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:filters="clr-namespace:AndroidLogViewer.Filters">
+    <DataTemplate DataType="filters:FiltersViewModel" x:Key="{x:Type filters:FiltersViewModel}">
+        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto" Grid.IsSharedSizeScope="True">
+            <StackPanel Orientation="Vertical">
+                <ItemsControl></ItemsControl>
+                <ContentControl Content="{Binding NewFilterViewModel}" />
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+</ResourceDictionary>

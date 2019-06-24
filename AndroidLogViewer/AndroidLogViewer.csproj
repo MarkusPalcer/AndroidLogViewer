@@ -68,6 +68,8 @@
     <Compile Include="Dialogs\Export\SimpleLogExportVisitor.cs" />
     <Compile Include="Dialogs\Export\WidthCountingVisitor.cs" />
     <Compile Include="Extensions\TextReaderExtensions.cs" />
+    <Compile Include="Filters\FiltersViewModel.cs" />
+    <Compile Include="Filters\NewFilterViewModel.cs" />
     <Compile Include="LogcatParser.cs" />
     <Compile Include="Models\ILogEntryVisitor.cs" />
     <Compile Include="Models\StartOfBufferEntry.cs" />
@@ -87,6 +89,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Progress\ProgressDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Filters\FiltersView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Filters\NewFilterView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
