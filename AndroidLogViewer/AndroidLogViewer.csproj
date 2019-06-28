@@ -69,7 +69,12 @@
     <Compile Include="Dialogs\Export\WidthCountingVisitor.cs" />
     <Compile Include="Extensions\TextReaderExtensions.cs" />
     <Compile Include="Filters\FiltersViewModel.cs" />
+    <Compile Include="Filters\FilterViewModel.cs" />
     <Compile Include="Filters\NewFilterViewModel.cs" />
+    <Compile Include="Filters\ParameterSelector\ParameterSelector.cs" />
+    <Compile Include="Filters\ParameterSelector\StringEntrySelector.cs" />
+    <Compile Include="Filters\Predicate\FilterPredicate.cs" />
+    <Compile Include="Filters\Source\StringFilterSource.cs" />
     <Compile Include="LogcatParser.cs" />
     <Compile Include="Models\ILogEntryVisitor.cs" />
     <Compile Include="Models\StartOfBufferEntry.cs" />
