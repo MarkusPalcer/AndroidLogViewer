@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="AndroidLogViewer.Filters.FilterEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AndroidLogViewer.Filters"
+             xmlns:style="clr-namespace:AndroidLogViewer.Style"
+             xmlns:parameterSelector="clr-namespace:AndroidLogViewer.Filters.ParameterSelector"
+             xmlns:wpf="clr-namespace:AndroidLogViewer.WPF"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance local:IFilterEditorViewModel}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorButtonColumn"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0"
+                    Orientation="Horizontal">
+            <ComboBox style:Grouping.Position="First"
+                      ItemsSource="{Binding FilterSources}"
+                      SelectedItem="{Binding SelectedFilterSource}" 
+                      DisplayMemberPath="Name" />
+            <ComboBox style:Grouping.Position="Middle"
+                      ItemsSource="{Binding FilterPredicates}"
+                      SelectedItem="{Binding SelectedFilterPredicate}"
+                      DisplayMemberPath="Name" />
+            <ContentControl Content="{Binding ParameterSelector}">
+                <ContentControl.Resources>
+
+                </ContentControl.Resources>
+                <ContentControl.ContentTemplateSelector>
+                    <wpf:TypeBasedTemplateSelector>
+                        <wpf:TypeBasedTemplate Type="parameterSelector:IListSelector">
+                            <DataTemplate DataType="parameterSelector:IListSelector">
+                                <ComboBox ItemsSource="{Binding AvailableValues}" 
+                                          SelectedItem="{Binding SelectedValue}" 
+                                          style:Grouping.Position="Last"/>
+                            </DataTemplate>
+                        </wpf:TypeBasedTemplate>
+                    </wpf:TypeBasedTemplateSelector>
+                </ContentControl.ContentTemplateSelector>
+            </ContentControl>
+        </StackPanel>
+    </Grid>
+</UserControl>

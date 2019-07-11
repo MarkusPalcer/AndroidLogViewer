@@ -68,19 +68,30 @@
     <Compile Include="Dialogs\Export\SimpleLogExportVisitor.cs" />
     <Compile Include="Dialogs\Export\WidthCountingVisitor.cs" />
     <Compile Include="Extensions\TextReaderExtensions.cs" />
+    <Compile Include="Filters\FilterEditorView.xaml.cs">
+      <DependentUpon>FilterEditorView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Filters\FiltersViewModel.cs" />
-    <Compile Include="Filters\FilterViewModel.cs" />
-    <Compile Include="Filters\NewFilterViewModel.cs" />
+    <Compile Include="Filters\FilterEditorViewModel.cs" />
+    <Compile Include="Filters\IFilterEditorViewModel.cs" />
+    <Compile Include="Filters\ParameterSelector\IParameterSelector.cs" />
     <Compile Include="Filters\ParameterSelector\ParameterSelector.cs" />
-    <Compile Include="Filters\ParameterSelector\StringEntrySelector.cs" />
+    <Compile Include="Filters\ParameterSelector\ListSelector.cs" />
     <Compile Include="Filters\Predicate\FilterPredicate.cs" />
-    <Compile Include="Filters\Source\StringFilterSource.cs" />
+    <Compile Include="Filters\Predicate\IFilterPredicate.cs" />
+    <Compile Include="Filters\Predicate\IsNotPredicate.cs" />
+    <Compile Include="Filters\Predicate\IsPredicate.cs" />
+    <Compile Include="Filters\Source\FilterSource.cs" />
+    <Compile Include="Filters\Source\IFilterSource.cs" />
+    <Compile Include="Filters\Source\ProcessSource.cs" />
+    <Compile Include="Filters\Source\TagSource.cs" />
     <Compile Include="LogcatParser.cs" />
     <Compile Include="Models\ILogEntryVisitor.cs" />
     <Compile Include="Models\StartOfBufferEntry.cs" />
     <Compile Include="Properties\Annotations1.cs" />
     <Compile Include="Style\Grouping.cs" />
     <Compile Include="TaskExtensions.cs" />
+    <Compile Include="WPF\TypeBasedTemplateSelector.cs" />
     <Page Include="Dialogs\Dialogs.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -97,11 +108,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Filters\FiltersView.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="Filters\FilterEditorView.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Filters\NewFilterView.xaml">
+    <Page Include="Filters\FiltersView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -2,15 +2,26 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using AndroidLogViewer.Annotations;
+using AndroidLogViewer.Filters.ParameterSelector;
 
 namespace AndroidLogViewer.Filters.Predicate
 {
-    public class FilterPredicate<TIn> : INotifyPropertyChanged
+    public abstract class FilterPredicate<TIn, TParameter> : IFilterPredicate<TIn, TParameter>
     {
-        public String Name { get; set; }
+        private readonly ParameterSelector<TParameter> parameterSelector;
 
-        public ParameterSelector.ParameterSelector<TIn> ParameterSelector { get; set; }
+        protected FilterPredicate(ParameterSelector<TParameter> parameterSelector)
+        {
+            this.parameterSelector = parameterSelector;
+        }
 
+        public abstract string Name { get; }
+
+        public IParameterSelector ParameterSelector => parameterSelector;
+
+        public abstract bool Evaluate(TIn data, TParameter parameter);
+
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -18,5 +29,6 @@ namespace AndroidLogViewer.Filters.Predicate
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        #endregion 
     }
 }

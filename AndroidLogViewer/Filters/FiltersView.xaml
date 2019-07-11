@@ -5,7 +5,7 @@
         <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto" Grid.IsSharedSizeScope="True">
             <StackPanel Orientation="Vertical">
                 <ItemsControl></ItemsControl>
-                <ContentControl Content="{Binding NewFilterViewModel}" />
+                
             </StackPanel>
         </ScrollViewer>
     </DataTemplate>
