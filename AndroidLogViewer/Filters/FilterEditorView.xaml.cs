@@ -1,28 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-namespace AndroidLogViewer.Filters
+﻿namespace AndroidLogViewer.Filters
 {
     /// <summary>
     /// Interaction logic for FilterEditorView.xaml
     /// </summary>
-    public partial class FilterEditorView : UserControl
+    public partial class FilterEditorView
     {
-        public FilterEditorView()
+        public FilterEditorView(FilterEditorViewModel viewModel)
         {
             InitializeComponent();
+
+            DataContext = viewModel;
         }
     }
 }

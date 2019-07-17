@@ -27,9 +27,6 @@
                       SelectedItem="{Binding SelectedFilterPredicate}"
                       DisplayMemberPath="Name" />
             <ContentControl Content="{Binding ParameterSelector}">
-                <ContentControl.Resources>
-
-                </ContentControl.Resources>
                 <ContentControl.ContentTemplateSelector>
                     <wpf:TypeBasedTemplateSelector>
                         <wpf:TypeBasedTemplate Type="parameterSelector:IListSelector">

@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using AndroidLogViewer.Filters.ParameterSelector;
 using AndroidLogViewer.Filters.Predicate;
+using PantherDI.Attributes;
 
 namespace AndroidLogViewer.Filters.Source
 {
+    [Singleton]
     public class TagSource : FilterSource<string>
     {
         public TagSource()

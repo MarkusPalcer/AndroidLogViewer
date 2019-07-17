@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -14,6 +13,7 @@ using System.Windows.Input;
 using AndroidLogViewer.Command;
 using AndroidLogViewer.Dialogs;
 using AndroidLogViewer.Dialogs.Export;
+using AndroidLogViewer.Events;
 using AndroidLogViewer.Properties;
 using Microsoft.Win32;
 
@@ -21,12 +21,12 @@ namespace AndroidLogViewer
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
+        private readonly IEventAggregator eventAggregator;
         private IEnumerable<LogEntry> _logEntries;
         
-        private ICollectionView _defaultView;
-
-        public MainWindowViewModel()
+        public MainWindowViewModel(IEventAggregator eventAggregator)
         {
+            this.eventAggregator = eventAggregator;
             SearchForwardCommand = new DelegateCommand<string>(SearchForward);
             SearchBackwardCommand = new DelegateCommand<string>(SearchBackward);
 
@@ -48,7 +48,7 @@ namespace AndroidLogViewer
             HideThreadOfSelectedItemCommand = new DelegateCommand(HideThreadOfSelectedItem);
 
             ExportCommand = new DelegateCommand(
-                () => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(_defaultView.OfType<LogEntry>().ToArray())).FireAndForget(), 
+                () => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(CollectionViewSource.GetDefaultView(_logEntries).OfType<LogEntry>().ToArray())).FireAndForget(), 
                 () => !string.IsNullOrEmpty(FileName)).ObservesProperty(() => FileName);
             ExportSelectionCommand = new DelegateCommand<IEnumerable<object>>(x => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(x.OfType<LogEntry>().ToArray())).FireAndForget());
             CopySelectionCommand = new DelegateCommand<IEnumerable<object>>(items => Clipboard.SetText(string.Join("\n", items.OfType<LogEntry>().Select(SimpleLogExportVisitor.FormatLogEntry))));
@@ -57,13 +57,15 @@ namespace AndroidLogViewer
             OpenUrlCommand = new DelegateCommand(OpenUrl);
             ImportClipboardCommand = new DelegateCommand(ImportFromClipboard);
 
-            WhitelistedProcessThreadFilters.CollectionChanged += RefreshView;
-            BlacklistedProcessThreadFilters.CollectionChanged += RefreshView;
-            WhitelistedTags.CollectionChanged += RefreshView;
-            BlacklistedTags.CollectionChanged += RefreshView;
+            WhitelistedProcessThreadFilters.CollectionChanged += (_,__) => eventAggregator.Raise<FilterChangedEvent>();
+            BlacklistedProcessThreadFilters.CollectionChanged += (_,__) => eventAggregator.Raise<FilterChangedEvent>();
+            WhitelistedTags.CollectionChanged += (_,__) => eventAggregator.Raise<FilterChangedEvent>();
+            BlacklistedTags.CollectionChanged += (_,__) => eventAggregator.Raise<FilterChangedEvent>();
 
             RemoveLeadingLinesCommand = new DelegateCommand(RemoveLinesBeforeSelected);
             RemoveTrailingLinesCommand = new DelegateCommand(() => LogEntries = RemoveLinesAfterSelected().ToArray());
+
+            eventAggregator.Subscribe<FilterChangedEvent>(RefreshView);
         }
 
         public string FileName
@@ -77,18 +79,18 @@ namespace AndroidLogViewer
             }
         }
 
-        private void RefreshView(object sender, NotifyCollectionChangedEventArgs args)
+        private void RefreshView()
         {
             // Try to find the entry in the filtered list or select the first item that comes after it.
             var selectedLogEntry = SelectedLogEntry;
 
-            if (_defaultView == null) return;
             if (_logEntries == null) return;
 
-            _defaultView.Refresh();
+            var defaultView = CollectionViewSource.GetDefaultView(_logEntries);
+            defaultView.Refresh();
 
             using(var logEntryEnumerator = _logEntries.GetEnumerator())
-            using(var filteredEnumerator = _defaultView.OfType<LogEntry>().GetEnumerator())
+            using(var filteredEnumerator = defaultView.OfType<LogEntry>().GetEnumerator())
             {
                 if (!logEntryEnumerator.MoveNext()) return;
                 var index = -1;
@@ -124,12 +126,13 @@ namespace AndroidLogViewer
                 _logEntries = value;
 
 
-                _defaultView = CollectionViewSource.GetDefaultView(_logEntries);
-                if (_defaultView != null) {
-                    _defaultView.Filter = FilterLogEntries;
+                var defaultView = CollectionViewSource.GetDefaultView(_logEntries);
+                if (defaultView != null) {
+                    defaultView.Filter = FilterLogEntries;
                 }
 
                 OnPropertyChanged();
+                eventAggregator.Raise<LogEntriesChangedEvent, IEnumerable<LogEntry>>(value);
             }
         }
 
@@ -329,7 +332,7 @@ namespace AndroidLogViewer
             {
                 if (value == _showVerbose) return;
                 _showVerbose = value;
-                _defaultView?.Refresh();
+                eventAggregator.Raise<FilterChangedEvent>();
                 OnPropertyChanged();
             }
         }
@@ -341,7 +344,7 @@ namespace AndroidLogViewer
             {
                 if (value == _showDebug) return;
                 _showDebug = value;
-                _defaultView?.Refresh();
+                eventAggregator.Raise<FilterChangedEvent>();
                 OnPropertyChanged();
             }
         }
@@ -353,7 +356,7 @@ namespace AndroidLogViewer
             {
                 if (value == _showInfo) return;
                 _showInfo = value;
-                _defaultView?.Refresh();
+                eventAggregator.Raise<FilterChangedEvent>();
                 OnPropertyChanged();
             }
         }
@@ -365,7 +368,7 @@ namespace AndroidLogViewer
             {
                 if (value == _showWarn) return;
                 _showWarn = value;
-                _defaultView?.Refresh();
+                eventAggregator.Raise<FilterChangedEvent>();
                 OnPropertyChanged();
             }
         }
@@ -377,7 +380,7 @@ namespace AndroidLogViewer
             {
                 if (value == _showError) return;
                 _showError = value;
-                _defaultView?.Refresh();
+                eventAggregator.Raise<FilterChangedEvent>();
                 OnPropertyChanged();
             }
         }
@@ -545,9 +548,11 @@ namespace AndroidLogViewer
 
         private void SearchBackward(string searchText)
         {
-            if (_defaultView == null) return;
+            if (_logEntries == null) return;
+            var defaultView = CollectionViewSource.GetDefaultView(_logEntries);
+            if (defaultView == null) return;
 
-            var items = _defaultView.OfType<LogEntry>().ToArray();
+            var items = defaultView.OfType<LogEntry>().ToArray();
 
             var newIndex = SelectedLogEntryIndex;
             while (newIndex > 0)
@@ -563,10 +568,12 @@ namespace AndroidLogViewer
 
         private void SearchForward(string searchText)
         {
-            if (_defaultView == null) return;
+            if (_logEntries == null) return;
+            var defaultView = CollectionViewSource.GetDefaultView(_logEntries);
+            if (defaultView == null) return;
 
             var newIndex = SelectedLogEntryIndex;
-            foreach (var entry in _defaultView.OfType<LogEntry>().Skip(SelectedLogEntryIndex + 1))
+            foreach (var entry in defaultView.OfType<LogEntry>().Skip(SelectedLogEntryIndex + 1))
             {
                 newIndex++;
                 if (MatchesSearch(entry, searchText))

@@ -1,16 +1,20 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using AndroidLogViewer.Filters;
 
 namespace AndroidLogViewer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
-        public MainWindow()
+        public MainWindow(MainWindowViewModel viewModel, FiltersView filtersView)
         {
             InitializeComponent();
+
+            DataContext = viewModel;
+            FiltersGroup.Content = filtersView;
 
             LogItems.SelectionChanged += (sender, args) => LogItems.ScrollIntoView(LogItems.SelectedItem);
         }

@@ -21,10 +21,6 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Window.DataContext>
-        <local:MainWindowViewModel />
-    </Window.DataContext>
-
     <Window.InputBindings>
         <KeyBinding Command="{Binding ImportClipboardCommand}"
                     Gesture="CTRL+SHIFT+V"></KeyBinding>
@@ -210,22 +206,9 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <GroupBox Header="Filters">
-                        <StackPanel Orientation="Vertical">
-                            <ItemsControl>
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                            <filters:FilterEditorView>
-                                <filters:FilterEditorView.DataContext>
-                                    <filters:FilterEditorViewModel />
-                                </filters:FilterEditorView.DataContext>
-                            </filters:FilterEditorView>
-                        </StackPanel>
-                    </GroupBox>
+                    <GroupBox Header="Filters"
+                              x:Name="FiltersGroup"/>
+
                     <GroupBox Header="Log Level">
                         <StackPanel Orientation="Vertical">
                             <CheckBox IsChecked="{Binding ShowVerbose}">Verbose</CheckBox>

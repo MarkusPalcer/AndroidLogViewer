@@ -1,17 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
+using PantherDI.ContainerCreation;
 
 namespace AndroidLogViewer
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            var container = new ContainerBuilder()
+                .WithSupportForUnregisteredTypes()
+                .WithAssembly(GetType().Assembly)
+                .WithGenericResolvers()
+                .Build();
+
+            MainWindow = container.Resolve<MainWindow>();
+            MainWindow.Show();
+        }
     }
 }

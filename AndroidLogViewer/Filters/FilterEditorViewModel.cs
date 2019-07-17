@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using AndroidLogViewer.Annotations;
+using AndroidLogViewer.Events;
 using AndroidLogViewer.Filters.ParameterSelector;
 using AndroidLogViewer.Filters.Predicate;
 using AndroidLogViewer.Filters.Source;
@@ -15,13 +16,21 @@ namespace AndroidLogViewer.Filters
         private IFilterSource selectedFilterSource;
         private IFilterPredicate selectedFilterPredicate;
 
-        public FilterEditorViewModel()
+        public FilterEditorViewModel(IEventAggregator eventAggregator, IEnumerable<IFilterSource> filterSources)
         {
-            FilterSources = new IFilterSource[]
+            FilterSources = filterSources.ToArray();
+
+            eventAggregator.Subscribe<LogEntriesChangedEvent, IEnumerable<LogEntry>>(UpdateParameterSelectors);
+        }
+
+        private void UpdateParameterSelectors(IEnumerable<LogEntry> logEntries)
+        {
+            var entries = logEntries as LogEntry[] ?? logEntries.ToArray();
+
+            foreach (var predicate in FilterSources.SelectMany(x => x.AvailablePredicates))
             {
-                new ProcessSource(), 
-                new TagSource(), 
-            };
+                predicate.ParameterSelector.RefreshSources(entries);
+            }
         }
 
         public IEnumerable<IFilterSource> FilterSources { get; }

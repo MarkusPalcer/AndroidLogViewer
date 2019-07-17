@@ -7,7 +7,6 @@ namespace AndroidLogViewer.Filters
     public class FiltersViewModel : INotifyPropertyChanged
     {
 
-
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
