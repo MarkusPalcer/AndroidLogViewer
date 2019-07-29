@@ -14,6 +14,7 @@ using AndroidLogViewer.Command;
 using AndroidLogViewer.Dialogs;
 using AndroidLogViewer.Dialogs.Export;
 using AndroidLogViewer.Events;
+using AndroidLogViewer.LogEntries;
 using AndroidLogViewer.Properties;
 using Microsoft.Win32;
 
@@ -22,11 +23,12 @@ namespace AndroidLogViewer
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         private readonly IEventAggregator eventAggregator;
-        private IEnumerable<LogEntry> _logEntries;
+        private readonly ILogEntryRepository logEntryRepository;
         
-        public MainWindowViewModel(IEventAggregator eventAggregator)
+        public MainWindowViewModel(IEventAggregator eventAggregator,  ILogEntryRepository logEntryRepository)
         {
             this.eventAggregator = eventAggregator;
+            this.logEntryRepository = logEntryRepository;
             SearchForwardCommand = new DelegateCommand<string>(SearchForward);
             SearchBackwardCommand = new DelegateCommand<string>(SearchBackward);
 
@@ -48,7 +50,7 @@ namespace AndroidLogViewer
             HideThreadOfSelectedItemCommand = new DelegateCommand(HideThreadOfSelectedItem);
 
             ExportCommand = new DelegateCommand(
-                () => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(CollectionViewSource.GetDefaultView(_logEntries).OfType<LogEntry>().ToArray())).FireAndForget(), 
+                () => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(CollectionViewSource.GetDefaultView(logEntryRepository.LogEntries).OfType<LogEntry>().ToArray())).FireAndForget(), 
                 () => !string.IsNullOrEmpty(FileName)).ObservesProperty(() => FileName);
             ExportSelectionCommand = new DelegateCommand<IEnumerable<object>>(x => ShowDialog<ExportDialogViewModel, object>(new ExportDialogViewModel(x.OfType<LogEntry>().ToArray())).FireAndForget());
             CopySelectionCommand = new DelegateCommand<IEnumerable<object>>(items => Clipboard.SetText(string.Join("\n", items.OfType<LogEntry>().Select(SimpleLogExportVisitor.FormatLogEntry))));
@@ -84,12 +86,10 @@ namespace AndroidLogViewer
             // Try to find the entry in the filtered list or select the first item that comes after it.
             var selectedLogEntry = SelectedLogEntry;
 
-            if (_logEntries == null) return;
-
-            var defaultView = CollectionViewSource.GetDefaultView(_logEntries);
+            var defaultView = CollectionViewSource.GetDefaultView(logEntryRepository.LogEntries);
             defaultView.Refresh();
 
-            using(var logEntryEnumerator = _logEntries.GetEnumerator())
+            using(var logEntryEnumerator = logEntryRepository.LogEntries.OfType<LogEntry>().GetEnumerator())
             using(var filteredEnumerator = defaultView.OfType<LogEntry>().GetEnumerator())
             {
                 if (!logEntryEnumerator.MoveNext()) return;
@@ -119,20 +119,19 @@ namespace AndroidLogViewer
 
         public IEnumerable<LogEntry> LogEntries
         {
-            get => _logEntries;
+            get => logEntryRepository.LogEntries;
             private set
             {
-                if (Equals(value, _logEntries)) return;
-                _logEntries = value;
+                if (Equals(value, logEntryRepository.LogEntries)) return;
+                logEntryRepository.LogEntries = value.ToArray();
 
 
-                var defaultView = CollectionViewSource.GetDefaultView(_logEntries);
+                var defaultView = CollectionViewSource.GetDefaultView(logEntryRepository.LogEntries);
                 if (defaultView != null) {
                     defaultView.Filter = FilterLogEntries;
                 }
 
                 OnPropertyChanged();
-                eventAggregator.Raise<LogEntriesChangedEvent, IEnumerable<LogEntry>>(value);
             }
         }
 
@@ -476,9 +475,6 @@ namespace AndroidLogViewer
 
         private async Task ProcessLogData(TextReader reader)
         {
-            LogEntries = null;
-            AvailableProcessThreadFilters = null;
-
             BlacklistedProcessThreadFilters.Clear();
             WhitelistedProcessThreadFilters.Clear();
 
@@ -548,8 +544,8 @@ namespace AndroidLogViewer
 
         private void SearchBackward(string searchText)
         {
-            if (_logEntries == null) return;
-            var defaultView = CollectionViewSource.GetDefaultView(_logEntries);
+            if (logEntryRepository.LogEntries == null) return;
+            var defaultView = CollectionViewSource.GetDefaultView(logEntryRepository.LogEntries);
             if (defaultView == null) return;
 
             var items = defaultView.OfType<LogEntry>().ToArray();
@@ -568,8 +564,8 @@ namespace AndroidLogViewer
 
         private void SearchForward(string searchText)
         {
-            if (_logEntries == null) return;
-            var defaultView = CollectionViewSource.GetDefaultView(_logEntries);
+            if (logEntryRepository.LogEntries == null) return;
+            var defaultView = CollectionViewSource.GetDefaultView(logEntryRepository.LogEntries);
             if (defaultView == null) return;
 
             var newIndex = SelectedLogEntryIndex;

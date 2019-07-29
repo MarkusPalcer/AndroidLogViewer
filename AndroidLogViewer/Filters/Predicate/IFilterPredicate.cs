@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using AndroidLogViewer.Filters.ParameterSelector;
 
 namespace AndroidLogViewer.Filters.Predicate
@@ -7,7 +8,7 @@ namespace AndroidLogViewer.Filters.Predicate
     {
         string Name { get; }
 
-        IParameterSelector ParameterSelector { get; }
+        Func<IParameterSelector> ParameterSelector { get; }
     }
 
 

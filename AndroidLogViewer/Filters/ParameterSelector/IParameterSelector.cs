@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using AndroidLogViewer.Properties;
 
 namespace AndroidLogViewer.Filters.ParameterSelector
 {
     public interface IParameterSelector : INotifyPropertyChanged
     {
         bool IsParameterValid { get; }
-
-        void RefreshSources(IEnumerable<LogEntry> logEntries);
     }
 
     public interface IParameterSelector<out TParameter> : IParameterSelector

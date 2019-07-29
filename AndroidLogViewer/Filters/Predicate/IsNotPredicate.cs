@@ -1,10 +1,11 @@
-﻿using AndroidLogViewer.Filters.ParameterSelector;
+﻿using System;
+using AndroidLogViewer.Filters.ParameterSelector;
 
 namespace AndroidLogViewer.Filters.Predicate
 {
     public class IsNotPredicate<T> : FilterPredicate<T,T>
     {
-        public IsNotPredicate(ParameterSelector<T> parameterSelector) : base(parameterSelector)
+        public IsNotPredicate(Func<ParameterSelector<T>> parameterSelectorFactory) : base(parameterSelectorFactory)
         {
         }
 

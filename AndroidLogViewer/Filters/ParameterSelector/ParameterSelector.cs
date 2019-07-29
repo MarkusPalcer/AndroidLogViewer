@@ -73,7 +73,5 @@ namespace AndroidLogViewer.Filters.ParameterSelector
                 OnPropertyChanged();
             }
         }
-
-        public abstract void RefreshSources(IEnumerable<LogEntry> logEntries);
     }
 }

@@ -1,8 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using AndroidLogViewer.Filters.Source;
+using AndroidLogViewer.LogEntries;
 
 namespace AndroidLogViewer.Filters.ParameterSelector
 {
@@ -21,12 +24,20 @@ namespace AndroidLogViewer.Filters.ParameterSelector
     public class ListSelector<T> : ParameterSelector<T>, IListSelector
     {
         private readonly IFilterSource<T> source;
+        private readonly ILogEntryRepository logEntryRepository;
         private HashSet<T> availableValues;
         private object selectedValue;
 
-        public ListSelector(IFilterSource<T> source)
+        public ListSelector(IFilterSource<T> source, ILogEntryRepository logEntryRepository)
         {
             this.source = source;
+            this.logEntryRepository = logEntryRepository;
+            RefreshSources();
+            WeakEventManager<ILogEntryRepository, EventArgs>.AddHandler(
+                logEntryRepository,
+                nameof(logEntryRepository.LogEntriesChanged), 
+                (_, __) => RefreshSources());
+
             OnParameterValueChanged += (sender, args) =>
             {
                 IsParameterValid = availableValues.Contains(Parameter);
@@ -53,9 +64,9 @@ namespace AndroidLogViewer.Filters.ParameterSelector
             SelectedValue = source.TransformLogEntry(entry);
         }
 
-        public override void RefreshSources(IEnumerable<LogEntry> logEntries)
+        public void RefreshSources()
         {
-            availableValues = new HashSet<T>(logEntries.Select(source.TransformLogEntry));
+            availableValues = new HashSet<T>(logEntryRepository.LogEntries.Select(source.TransformLogEntry));
             OnPropertyChanged(nameof(AvailableValues));
         }
     }

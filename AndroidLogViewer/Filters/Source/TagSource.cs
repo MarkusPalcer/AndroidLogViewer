@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AndroidLogViewer.Filters.ParameterSelector;
 using AndroidLogViewer.Filters.Predicate;
 using PantherDI.Attributes;
@@ -8,12 +9,12 @@ namespace AndroidLogViewer.Filters.Source
     [Singleton]
     public class TagSource : FilterSource<string>
     {
-        public TagSource()
+        public TagSource(Func<FilterSource<string>, ListSelector<string>> listSelectorFactory)
         {
             AvailablePredicates = new IFilterPredicate[]
             {
-                new IsPredicate<string>(new ListSelector<string>(this)), 
-                new IsNotPredicate<string>(new ListSelector<string>(this)), 
+                new IsPredicate<string>(()=>listSelectorFactory(this)), 
+                new IsNotPredicate<string>(()=>listSelectorFactory(this)), 
             };
         }
 

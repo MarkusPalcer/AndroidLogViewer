@@ -8,16 +8,16 @@ namespace AndroidLogViewer.Filters.Predicate
 {
     public abstract class FilterPredicate<TIn, TParameter> : IFilterPredicate<TIn, TParameter>
     {
-        private readonly ParameterSelector<TParameter> parameterSelector;
+        private readonly Func<ParameterSelector<TParameter>> parameterSelectorFactory;
 
-        protected FilterPredicate(ParameterSelector<TParameter> parameterSelector)
+        protected FilterPredicate(Func<ParameterSelector<TParameter>> parameterSelectorFactory)
         {
-            this.parameterSelector = parameterSelector;
+            this.parameterSelectorFactory = parameterSelectorFactory;
         }
 
         public abstract string Name { get; }
 
-        public IParameterSelector ParameterSelector => parameterSelector;
+        public Func<IParameterSelector> ParameterSelector => parameterSelectorFactory;
 
         public abstract bool Evaluate(TIn data, TParameter parameter);
 

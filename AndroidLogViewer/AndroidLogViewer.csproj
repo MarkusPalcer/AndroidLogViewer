@@ -130,7 +130,6 @@
     <Compile Include="Events\FilterChangedEvent.cs" />
     <Compile Include="Events\IEvent.cs" />
     <Compile Include="Events\IEventAggregator.cs" />
-    <Compile Include="Events\LogEntriesChangedEvent.cs" />
     <Compile Include="Extensions\ActionExtensions.cs" />
     <Compile Include="Extensions\TextReaderExtensions.cs" />
     <Compile Include="Filters\FilterEditorView.xaml.cs">
@@ -154,6 +153,7 @@
     <Compile Include="Filters\Source\ProcessSource.cs" />
     <Compile Include="Filters\Source\TagSource.cs" />
     <Compile Include="LogcatParser.cs" />
+    <Compile Include="LogEntries\LogEntryRepository.cs" />
     <Compile Include="Models\ILogEntryVisitor.cs" />
     <Compile Include="Models\StartOfBufferEntry.cs" />
     <Compile Include="Properties\Annotations1.cs" />

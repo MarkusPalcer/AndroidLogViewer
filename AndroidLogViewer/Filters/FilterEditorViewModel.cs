@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using AndroidLogViewer.Annotations;
-using AndroidLogViewer.Events;
 using AndroidLogViewer.Filters.ParameterSelector;
 using AndroidLogViewer.Filters.Predicate;
 using AndroidLogViewer.Filters.Source;
@@ -13,24 +14,14 @@ namespace AndroidLogViewer.Filters
 {
     public class FilterEditorViewModel : IFilterEditorViewModel
     {
+
         private IFilterSource selectedFilterSource;
         private IFilterPredicate selectedFilterPredicate;
+        private IParameterSelector parameterSelector;
 
-        public FilterEditorViewModel(IEventAggregator eventAggregator, IEnumerable<IFilterSource> filterSources)
+        public FilterEditorViewModel(IEnumerable<IFilterSource> filterSources)
         {
             FilterSources = filterSources.ToArray();
-
-            eventAggregator.Subscribe<LogEntriesChangedEvent, IEnumerable<LogEntry>>(UpdateParameterSelectors);
-        }
-
-        private void UpdateParameterSelectors(IEnumerable<LogEntry> logEntries)
-        {
-            var entries = logEntries as LogEntry[] ?? logEntries.ToArray();
-
-            foreach (var predicate in FilterSources.SelectMany(x => x.AvailablePredicates))
-            {
-                predicate.ParameterSelector.RefreshSources(entries);
-            }
         }
 
         public IEnumerable<IFilterSource> FilterSources { get; }
@@ -57,11 +48,20 @@ namespace AndroidLogViewer.Filters
                 if (Equals(value, selectedFilterPredicate)) return;
                 selectedFilterPredicate = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(ParameterSelector));
+                ParameterSelector = value?.ParameterSelector();
             }
         }
 
-        public IParameterSelector ParameterSelector => SelectedFilterPredicate?.ParameterSelector;
+        public IParameterSelector ParameterSelector
+        {
+            get => parameterSelector;
+            private set
+            {
+                if (Equals(value, parameterSelector)) return;
+                parameterSelector = value;
+                OnPropertyChanged();
+            }
+        }
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
